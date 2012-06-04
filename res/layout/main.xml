@@ -3,10 +3,65 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
-    <TextView
+    
+    <LinearLayout
+        android:id="@+id/currentlyplayingwrap"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hello" />
+        android:orientation="vertical"
+        android:layout_paddingBottom="10dip"
+        android:layout_marginBottom="4dip">
+        	<TextView 
+        	    android:text="Currently Playing:"
+        	    android:textStyle="bold"
+        	    android:layout_width="fill_parent"
+        	    android:layout_height="wrap_content"
+        	   />
+        
+		   <TextView android:id="@+id/currentlyplaying"
+		       android:layout_height="wrap_content"
+		       android:layout_width="fill_parent"
+		       android:text="Skrilex - Scary Monsters And Nice Sprites"/>
+        
+        
+	    <View 
+	        android:background="@drawable/border_bottom"
+	        android:layout_width="fill_parent"
+	        android:layout_height="4dip"
+	        />
+    </LinearLayout>
+
+    <ScrollView 
+        android:id="@+id/muziekLijst"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        >
+   		 
+        <LinearLayout
+            android:id="@+id/listviewdinges"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        
+        
+	       <include layout="@layout/muziekitem" />
+	       <include layout="@layout/muziekitem" />
+	       <include layout="@layout/muziekitem" />
+	       <include layout="@layout/muziekitem" />
+	       <include layout="@layout/muziekitem" />
+	       <include layout="@layout/muziekitem" />
+	       <include layout="@layout/muziekitem" />
+	       <include layout="@layout/muziekitem" />
+	       <include layout="@layout/muziekitem" />
+	       <include layout="@layout/muziekitem" />
+	       
+        
+        </LinearLayout>
+        
+        
+    </ScrollView>
+        
+
+
 
 </LinearLayout>
