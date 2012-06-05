@@ -28,7 +28,7 @@ public class MarietjeConnection {
 		MarietjeTrack mt;
 		for (int i = 0; i <= 10; i++){
 			mt = new MarietjeTrack();
-			mt.setInfo(i + "", "Lied " + i, "Artiest " + i, i * 1000);
+			mt.setInfo(i + "", "Lied " + i, "Artiest " + i, i * 100000);
 			lijst[i] = mt;
 		}
 		

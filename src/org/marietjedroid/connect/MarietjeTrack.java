@@ -77,7 +77,15 @@ public class MarietjeTrack {
     	int minutes = (int)(seconds / 60);
     	int seconds_i = (int)(seconds % 60);
     	
-    	return minutes + ":" + seconds_i;
+    	String sec_s;
+    	if(seconds_i < 10){
+    		sec_s = "0" + seconds_i;
+    	}
+    	else{
+    		sec_s = "" + seconds_i;
+    	}
+    	
+    	return minutes + ":" + sec_s;
 		
 	}
 	

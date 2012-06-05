@@ -26,8 +26,7 @@ public class MarietjeDroidActivity extends Activity{
 	private static MarietjeConnection mc = null;
 	private static MarietjeTrack[] playlist = null;
 	private Handler mHandler = new Handler();
-	private MarietjeTrack mut;
-	View vv;
+	private ArrayList<TextView> durationlist;
 	
 	public static MarietjeConnection getConnection(){
 		return mc;
@@ -38,6 +37,8 @@ public class MarietjeDroidActivity extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        durationlist = new ArrayList<TextView>();
         
         mc = new MarietjeConnection("localhost", 1234);
         if (!mc.connect()){
@@ -69,9 +70,30 @@ public class MarietjeDroidActivity extends Activity{
 	        TextView duration = (TextView) v.findViewById(R.id.tracklength);
 	        duration.setText(mt.getTrackStringTimeLeft());
 	        
+	        durationlist.add(duration);
+	        
 	        muzieklijst.addView(v);
-        }        
+        }
+        
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        mHandler.postDelayed(mUpdateTimeTask, 1000);
     }
+    
+    private Runnable mUpdateTimeTask = new Runnable() {
+		
+		@Override
+		public void run() {
+			for(int i = 0; i < durationlist.size(); i++){
+				TextView tv = durationlist.get(i);
+				MarietjeTrack track = playlist[i];
+				track.decreaseTime();
+				tv.setText(track.getTrackStringTimeLeft());
+			}
+			
+			mHandler.postDelayed(this, 1000);
+			
+		}
+	};
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
