@@ -17,14 +17,25 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class MarietjeDroidActivity extends Activity{
+public class MarietjeDroidActivity extends Activity implements OnClickListener {
 	
 	private static MarietjeConnection mc = null;
 	private static MarietjeTrack[] playlist = null;
+	
+    private static final String[] SONGS = new String[] {
+        "Nothing Else Matters", "One", "Enter Sandman", "Fade to Black", "Fuel"
+    };
+    
+    private AutoCompleteTextView requesttxt = null;
+	
 	private Handler mHandler = new Handler();
 	private ArrayList<TextView> durationlist;
 	
@@ -61,11 +72,9 @@ public class MarietjeDroidActivity extends Activity{
 	        
 	        muzieklistrow.setOnClickListener(sl);
 	        
-	        TextView titel = (TextView) v.findViewById(R.id.title);
-	        titel.setText(mt.getTitle());
+	        ((TextView) v.findViewById(R.id.title)).setText(mt.getTitle());
 	        
-	        TextView artiest = (TextView) v.findViewById(R.id.artist);
-	        artiest.setText(mt.getArtist());
+	        ((TextView) v.findViewById(R.id.artist)).setText(mt.getArtist());
 	        
 	        TextView duration = (TextView) v.findViewById(R.id.tracklength);
 	        duration.setText(mt.getTrackStringTimeLeft());
@@ -74,6 +83,14 @@ public class MarietjeDroidActivity extends Activity{
 	        
 	        muzieklijst.addView(v);
         }
+        
+        
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, SONGS);
+        requesttxt = (AutoCompleteTextView) findViewById(R.id.requesttext);
+        requesttxt.setAdapter(adapter);
+        
+        ((Button) findViewById(R.id.requestbutton)).setOnClickListener(this);        
         
         mHandler.removeCallbacks(mUpdateTimeTask);
         mHandler.postDelayed(mUpdateTimeTask, 1000);
@@ -97,8 +114,7 @@ public class MarietjeDroidActivity extends Activity{
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
+        getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
     
@@ -107,33 +123,36 @@ public class MarietjeDroidActivity extends Activity{
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.mnurequest:
-            	
-            	Intent ri = new Intent(getApplicationContext(), RequestActivity.class);
-            	startActivity(ri);
+            	startActivity(new Intent(getApplicationContext(), RequestActivity.class));
             	
                 return true;
             case R.id.mnulogin:
-            	
-                Intent li = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(li);
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             	
                 return true;
+                
+            case R.id.mnuupload:
+            	startActivity(new Intent(getApplicationContext(), UploadActivity.class));
+            	
+            	return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
 	public static void setTimeLeft(TextView duration, MarietjeTrack mt) {
-		// TODO Auto-generated method stub
 		duration.setText(mt.getTrackStringTimeLeft());
 	}
     
     private void updateCurrentlyPlaying(){
     	MarietjeTrack currentlyPlaying = mc.getCurrentlyPlaying();
     	
-    	TextView txtCurrentlyPlaying = (TextView) findViewById(R.id.currentlyplaying);
-    	
-    	txtCurrentlyPlaying.setText(currentlyPlaying.getArtist() + " - " + currentlyPlaying.getTitle());
+    	((TextView) findViewById(R.id.currentlyplaying)).setText(currentlyPlaying.getArtist() + " - " + currentlyPlaying.getTitle());
     }
+
+	@Override
+	public void onClick(View v) {
+		Log.d("Request", requesttxt.getText().toString());
+	}
     
 }

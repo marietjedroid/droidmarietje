@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="10dip"
+        android:layout_marginBottom="4dip">
+        	<TextView 
+        	    android:text="Upload"
+        	    android:textStyle="bold"
+        	    android:layout_width="fill_parent"
+        	    android:layout_height="wrap_content"
+        	   />
+        
+		   <TextView
+		       android:layout_height="wrap_content"
+		       android:layout_width="fill_parent"
+		       android:text="Upload files from your device"/>
+        
+        
+	    <View 
+	        android:background="@drawable/border_bottom"
+	        android:layout_width="fill_parent"
+	        android:layout_height="4dip"
+	        />
+    </LinearLayout>
+   		 
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            
+            <Button 
+                android:id="@+id/btnpickfile"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dip"
+                android:text="Pick a file"
+                />
+            
+            <TextView
+                android:id="@+id/txtfilename"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                
+                />
+            
+            <CheckBox 
+                android:id="@+id/chkrequestonupload"
+                android:checked="true"
+                android:text="Request file after upload"
+                android:layout_height="fill_parent"
+                android:layout_width="fill_parent"
+                android:visibility="invisible"
+                />
+            
+            <Button
+                android:id="@+id/btnupload"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:text="Upload"
+                android:visibility="invisible"
+                /> 
+            
+        </LinearLayout>
+
+</LinearLayout>
