@@ -6,6 +6,11 @@ package org.marietjedroid.connect;
  */
 public class MarietjeConnection {
 	
+	private MarietjePlaying nowPlaying;
+	private MarietjeRequest[] Queue;
+	
+	
+	
 	/** 
 	 * @param host
 	 * @param Port
