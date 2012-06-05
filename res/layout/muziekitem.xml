@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="50dip"
+    android:gravity="right"
+    android:orientation="horizontal"
+    android:paddingBottom="5dip"
+    android:paddingLeft="5dip"
+    android:paddingRight="0dip"
+    android:paddingTop="5dip"
+    android:id="@+id/muziekitem"
+    android:clickable="true">
+     
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18dp"
+        android:textSize="15dip"
+        android:textStyle="bold"
+        android:typeface="sans" />
+
+    <TextView
+        android:id="@+id/artist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/title"
+        android:layout_below="@+id/title"
+        android:textSize="11dip"
+        android:textStyle="bold"
+        android:typeface="sans" />
+    
+    <TextView
+        android:id="@+id/tracklength"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_width="50dip"
+        android:textSize="11dip"/>
+
+	    <View 
+	        android:background="@drawable/border_bottom_gradient"
+	        android:layout_width="fill_parent"
+	        android:layout_height="1dip"
+	    />
+    
+</RelativeLayout>

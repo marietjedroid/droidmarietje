@@ -5,63 +5,52 @@
     android:orientation="vertical" >
     
     <LinearLayout
-        android:id="@+id/currentlyplayingwrap"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="10dip"
+        android:layout_marginBottom="4dip">
         	<TextView 
-        	    android:text="Currently Playing:"
+        	    android:text="Request"
         	    android:textStyle="bold"
         	    android:layout_width="fill_parent"
         	    android:layout_height="wrap_content"
         	   />
         
-		   <TextView android:id="@+id/currentlyplaying"
+		   <TextView
 		       android:layout_height="wrap_content"
 		       android:layout_width="fill_parent"
-			/>
+		       android:text="Request a song by typing its title or artist in the text field"/>
         
         
 	    <View 
 	        android:background="@drawable/border_bottom"
 	        android:layout_width="fill_parent"
 	        android:layout_height="4dip"
-	        
 	        />
     </LinearLayout>
-
-    <ScrollView 
-        android:id="@+id/muziekLijst"
-        android:layout_height="fill_parent"
-        android:layout_width="fill_parent"
-        >
    		 
         <LinearLayout
-            android:id="@+id/muzieklijstview"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
         
+            <AutoCompleteTextView 
+                android:id="@+id/songautocomplete"
+                android:padding="15dip"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                />
+        	
+            <Button 
+                android:id="@+id/requestbutton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dip"
+                android:text="Request this song"
+                />
             
-            <!--        
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       -->
-        
         </LinearLayout>
-        
-        
-    </ScrollView>
-        
-
-
 
 </LinearLayout>

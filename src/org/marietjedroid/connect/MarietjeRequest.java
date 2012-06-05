@@ -14,6 +14,10 @@ public class MarietjeRequest extends MarietjeTrack {
 		return key;
 	}
 	
+	public boolean requestByKey(String key){
+		
+		return true;
+	}
 	
 	
 }

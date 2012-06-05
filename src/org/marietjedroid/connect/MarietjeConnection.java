@@ -22,7 +22,24 @@ public class MarietjeConnection {
 	public MarietjeTrack[] getPlaylist() {
 		//TODO
 		
-		return null;	
+		MarietjeTrack[] lijst = null;
+		lijst = new MarietjeTrack[11];
+		
+		MarietjeTrack mt;
+		for (int i = 0; i <= 10; i++){
+			mt = new MarietjeTrack();
+			mt.setInfo(i + "", "Lied " + i, "Artiest " + i, i * 1000);
+			lijst[i] = mt;
+		}
+		
+		return lijst;	
+	}
+	
+	public MarietjeTrack getCurrentlyPlaying(){
+		MarietjeTrack mt = new MarietjeTrack();
+		mt.setInfo("gfds", "Scary Monsters And Nice Sprites", "Skrillex", 12345);
+		
+		return mt;
 	}
 	
 	public MarietjeTrack[] getQueryResults(String query) {
@@ -31,15 +48,13 @@ public class MarietjeConnection {
 		
 	}
 	
-	public boolean login(String username, String password ){
+	public boolean login(String username, String password) {
 		//TODO
-		 return false;
+		 return true;
 	}
 	
 	public boolean connect() {
-		return false;
+		return true;
 		
 	}
-	
-	
 }
