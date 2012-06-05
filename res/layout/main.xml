@@ -5,6 +5,8 @@
     android:orientation="vertical" >
     
     <LinearLayout
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:id="@+id/currentlyplayingwrap"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -21,8 +23,9 @@
         	    android:layout_height="wrap_content"
         	    android:padding="5dip"
         	    android:hint="Request a song"
-        	    android:completionThreshold="3"
+        	    android:completionThreshold="1"
         	    android:singleLine="true"
+        	    
         	    />
         	
         	<Button android:id="@+id/requestbutton"

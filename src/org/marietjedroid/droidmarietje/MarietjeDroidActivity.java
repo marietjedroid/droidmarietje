@@ -49,6 +49,8 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
+        
+        
         durationlist = new ArrayList<TextView>();
         
         mc = new MarietjeConnection("localhost", 1234);
@@ -91,6 +93,8 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
         requesttxt.setAdapter(adapter);
         
         ((Button) findViewById(R.id.requestbutton)).setOnClickListener(this);        
+        findViewById(R.id.currentlyplayingwrap).requestFocus();
+        
         
         mHandler.removeCallbacks(mUpdateTimeTask);
         mHandler.postDelayed(mUpdateTimeTask, 1000);

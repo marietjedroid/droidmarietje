@@ -33,7 +33,6 @@ public class UploadActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		
 		int clicked = v.getId();
 		
 		if (clicked == R.id.btnpickfile) {
@@ -49,6 +48,10 @@ public class UploadActivity extends Activity implements OnClickListener {
 	}
 	
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	if(data == null){
+    		return;
+    	}
+    	
     	Uri selectedFile = data.getData();
     	
     	String filePath = selectedFile.getLastPathSegment();
