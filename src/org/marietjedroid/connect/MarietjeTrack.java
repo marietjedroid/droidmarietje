@@ -1,6 +1,7 @@
 package org.marietjedroid.connect;
 
-import android.util.Log;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MarietjeTrack {
 	
@@ -26,8 +27,6 @@ public class MarietjeTrack {
 	 * Track identifier
 	 */
 	private String trackKey;
-	
-	private double timeLeft;
 	
 	/**
 	 * @return the artist
@@ -68,9 +67,6 @@ public class MarietjeTrack {
 		return timeToString(this.length);
 	}
 	
-	public String getTrackStringTimeLeft(){
-		return timeToString(this.timeLeft);
-	}
 
 	private static String timeToString(double time){
 		double seconds = time / 1000;
@@ -89,35 +85,36 @@ public class MarietjeTrack {
 		
 	}
 	
-	/**
-	 * @return the byKey
-	 */
-	public String getByKey() {
-		return byKey;
-	}
-	
-	public double getTimeLeft(){
-		return this.timeLeft;
-	}
-
 	public void setInfo(String key, String titel, String artiest, double length){
 		this.trackKey = key;
 		this.title = titel;
 		this.artist = artiest;
 		this.length = length;
-		this.timeLeft = length;
-		
-		Log.d("Info", this.trackKey + " " + this.title);
 	}
 	
-	/**
-	 * Requester, may be null (in that case it was auto-queued) 
-	 */
-	private String byKey;
+	
+	public MarietjeTrack(String artist, String title, double length, String uploader, String trackKey) {
+		this.artist = artist;
+		this.title = title;
+		this.length = length;
+		this.uploadedBy =  uploader;
+	}
 
-	public void decreaseTime() {
-		this.timeLeft = Math.max(timeLeft - 1000, 0);
-		
+	/**
+	 * @param media
+	 */
+	public MarietjeTrack(JSONObject media) {
+		try {
+			this.artist = media.getString("artist");
+			this.title = media.getString("title");
+			this.trackKey = media.getString("key");
+			this.uploadedBy = media.getString("uploadedByKey");
+			this.length = media.getDouble("length");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 }

@@ -43,7 +43,7 @@ class MarietjeClientChannel extends JoyceChannel {
 	/**
 	 * login error TODO confirm that this is a string
 	 */
-	private String loginError;
+	private MarietjeException loginError;
 
 	/**
 	 * request errors TODO confirm that this is a String
@@ -74,14 +74,19 @@ class MarietjeClientChannel extends JoyceChannel {
 	 */
 	private final Semaphore requestsRetrieved;
 	
-	
+	private final Semaphore queueRetrieved;
+
+	private JSONArray requests;
+
+	private final Semaphore loginAttempt;
 	
 	
 	public MarietjeClientChannel(MarietjeClient server) {
 		super(new JoyceRelay(new JoyceHub()), null);
 
 		this.server = server;
-
+		this.loginAttempt = server.getLoginAttemptSemaphore();
+		this.queueRetrieved = server.getQueueRetrievedSemaphore();
 		this.tracksRetrieved = server.getTracksRetrievedSemaphore();
 		this.playingRetrieved = server.getPlayingRetrievedSemaphore();
 		this.requestsRetrieved = server.getRequestsRetrievedSemaphore();
@@ -123,10 +128,28 @@ class MarietjeClientChannel extends JoyceChannel {
 				playingRetrieved.release();
 			}
 		} else if (data.getString("type").equals("requests")){
-			synchronized(this.requestsRetrieved) {
-				// TODO
+			synchronized(queueRetrieved) {
+					this.requests = data.getJSONArray("requests");
+					this.requestsRetrieved.release();
+				}
+			
+		} else if (data.getString("type").equals("error_login")) {
+			synchronized(loginAttempt) {
+				this.loginError = new MarietjeException (data.getString("message"));
+				this.loginAttempt.release();
 			}
+		} else if (data.getString("type").equals("logged_in")) {
+			synchronized(loginAttempt) {
+				this.loginToken = data.getString("login_token");
+				loginAttempt.release();
+			}
+		} else if (data.getString("type").equals("error_request")) {
+			this.requestError = data.getString("message");
 		}
 	}
-
+	
+	
+	JSONArray getRequests () {
+		return this.requests;
+	}
 }
