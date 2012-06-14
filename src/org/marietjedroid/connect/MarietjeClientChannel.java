@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.thomwiggers.Jjoyce.base.JoyceChannel;
+import org.thomwiggers.Jjoyce.base.JoyceClient;
 import org.thomwiggers.Jjoyce.base.JoyceHub;
 import org.thomwiggers.Jjoyce.base.JoyceRelay;
 
@@ -79,11 +80,10 @@ class MarietjeClientChannel extends JoyceChannel {
 	private JSONArray requests;
 
 	private final Semaphore loginAttempt;
-	
-	
-	public MarietjeClientChannel(MarietjeClient server) {
-		super(new JoyceRelay(new JoyceHub()), null);
 
+	public MarietjeClientChannel(MarietjeClient server, String host, int port, String path) {
+		super(new JoyceRelay(new JoyceClient(host, port, path)), null);
+		
 		this.server = server;
 		this.loginAttempt = server.getLoginAttemptSemaphore();
 		this.queueRetrieved = server.getQueueRetrievedSemaphore();

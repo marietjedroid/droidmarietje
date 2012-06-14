@@ -13,6 +13,7 @@ import org.thomwiggers.Jjoyce.base.JoyceChannel;
 import org.thomwiggers.Jjoyce.base.NotImplementedException;
 
 public class MarietjeClient {
+	
 	private static final String DEFAULT_REQUESTER = "marietje";
 	/**
 	 * Locks until we have recieved tracks
@@ -40,8 +41,8 @@ public class MarietjeClient {
 	private final MarietjeClientChannel channel;
 	private String accessKey = null;
 	
-	public MarietjeClient() {
-		this.channel = new MarietjeClientChannel(this);
+	public MarietjeClient(String host, int port, String path) {
+		this.channel = new MarietjeClientChannel(this, host, port, path);
 	}
 	
 	JoyceChannel getChannel() {
