@@ -85,14 +85,27 @@ public class MarietjeTrack {
 		
 	}
 	
-	public void setInfo(String key, String titel, String artiest, double length){
+	/**
+	 * @param key
+	 * @param title
+	 * @param artiest
+	 * @param length
+	 */
+	public void setInfo(String key, String title, String artiest, double length){
 		this.trackKey = key;
-		this.title = titel;
+		this.title = title;
 		this.artist = artiest;
 		this.length = length;
 	}
 	
 	
+	/**
+	 * @param artist
+	 * @param title
+	 * @param length
+	 * @param uploader
+	 * @param trackKey
+	 */
 	public MarietjeTrack(String artist, String title, double length, String uploader, String trackKey) {
 		this.artist = artist;
 		this.title = title;

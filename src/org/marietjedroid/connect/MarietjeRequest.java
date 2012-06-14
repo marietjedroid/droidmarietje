@@ -43,10 +43,12 @@ public class MarietjeRequest extends MarietjeTrack {
 	public int getKey() {
 		return key;
 	}
-	
-	public boolean requestByKey(String key){
-		
-		return true;
+
+	/**
+	 * @return the requester
+	 */
+	public String getRequester() {
+		return requester;
 	}
 	
 	

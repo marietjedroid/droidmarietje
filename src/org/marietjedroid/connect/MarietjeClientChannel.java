@@ -41,22 +41,22 @@ class MarietjeClientChannel extends JoyceChannel {
 	private String loginToken;
 
 	/**
-	 * login error TODO confirm that this is a string
+	 * login error
 	 */
 	private MarietjeException loginError;
 
 	/**
-	 * request errors TODO confirm that this is a String
+	 * request errors 
 	 */
-	private String requestError;
+	private String requestError = null;
 	
 	/**
 	 * The currently playing track
 	 */
-	private JSONArray nowPlaying;
+	private JSONObject nowPlaying;
 
 	/**
-	 * Access Key TODO confirm that this is a string
+	 * Access Key 
 	 */
 	private String accessKey;
 
@@ -124,7 +124,7 @@ class MarietjeClientChannel extends JoyceChannel {
 			return;
 		else if (data.getString("type").equals("playing")) {
 			synchronized (playingRetrieved) {
-				this.nowPlaying = data.getJSONArray("playing");
+				this.nowPlaying = data.getJSONObject("playing");
 				playingRetrieved.release();
 			}
 		} else if (data.getString("type").equals("requests")){
@@ -140,11 +140,12 @@ class MarietjeClientChannel extends JoyceChannel {
 			}
 		} else if (data.getString("type").equals("logged_in")) {
 			synchronized(loginAttempt) {
-				this.loginToken = data.getString("login_token");
+				this.accessKey = data.getString("accessKey");
 				loginAttempt.release();
 			}
 		} else if (data.getString("type").equals("error_request")) {
 			this.requestError = data.getString("message");
+			this.requestsRetrieved.release();
 		}
 	}
 	
@@ -152,4 +153,43 @@ class MarietjeClientChannel extends JoyceChannel {
 	JSONArray getRequests () {
 		return this.requests;
 	}
+
+	/**
+	 * @return the nowPlaying
+	 */
+	public JSONObject getNowPlaying() {
+		return nowPlaying;
+	}
+
+	/**
+	 * @return the loginToken
+	 */
+	public String getLoginToken() {
+		return loginToken;
+	}
+
+	/**
+	 * @return the loginError
+	 */
+	public MarietjeException getLoginError() {
+		return loginError;
+	}
+
+	/**
+	 * @return the accessKey
+	 */
+	public String getAccessKey() {
+		return accessKey;
+	}
+
+	/**
+	 * @return the requestError
+	 */
+	public String getRequestError() {
+		return requestError;
+	}
+
+
+
+
 }

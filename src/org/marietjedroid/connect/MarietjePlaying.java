@@ -1,19 +1,19 @@
 package org.marietjedroid.connect;
 
+import org.json.JSONObject;
+
 public class MarietjePlaying extends MarietjeTrack {
-	public MarietjePlaying(String artist, String title, double length,
-			String uploader, String requester) {
-		super(artist, title, length, requester, uploader);
-		this.requester = requester;
+	/**
+	 * @param byKey The one who requested it
+	 * @param servertime 
+	 * @param endtime
+	 * @param media media dict
+	 */
+	public MarietjePlaying(String byKey, double servertime, double endtime, JSONObject media ) {
+		super(media);
 		// TODO Auto-generated constructor stub
 	}
 	
-	
-	/**
-	 * Diegene die heeft aangevraagd
-	 */
-	private String requester;
-
 	/**
 	 * Tijd op de server ten tijde van zenden bericht 
 	 */
