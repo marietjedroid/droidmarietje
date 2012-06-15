@@ -81,6 +81,8 @@ class MarietjeClientChannel extends JoyceChannel {
 
 	private final Semaphore loginAttempt;
 
+	private ArrayList<MarietjeTrack> queryResults = new ArrayList<MarietjeTrack>();
+
 	public MarietjeClientChannel(MarietjeClient server, String host, int port, String path) {
 		super(new JoyceRelay(new JoyceClient(host, port, path)), null);
 		
@@ -146,6 +148,21 @@ class MarietjeClientChannel extends JoyceChannel {
 		} else if (data.getString("type").equals("error_request")) {
 			this.requestError = data.getString("message");
 			this.requestsRetrieved.release();
+		} else if (data.getString("type").equals("query_media_results")) {
+			if(data.getInt("token") != server.queryToken) {
+				return; // wrong result set
+			} 
+			synchronized (this.queryResults) {
+				this.queryResults.clear();
+				JSONArray results = data.getJSONArray("results");
+				for(int i = 0; results.opt(i) != null; i++) {
+					JSONObject m = results.getJSONObject(i);
+					this.queryResults.add(new MarietjeTrack(m));
+				}
+				this.queueRetrieved.release();
+			}
+			
+			
 		}
 	}
 	
@@ -187,6 +204,11 @@ class MarietjeClientChannel extends JoyceChannel {
 	 */
 	public String getRequestError() {
 		return requestError;
+	}
+
+	public MarietjeTrack[] getQueryResults() {
+		return this.queryResults.toArray(new MarietjeTrack[0]);
+		
 	}
 
 

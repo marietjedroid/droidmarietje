@@ -38,8 +38,11 @@ public class MarietjeClient {
 	 */
 	private final Semaphore loginAttempt = new Semaphore(0);
 	
+	private final Semaphore searchResults = new Semaphore(0);
+	
 	private final MarietjeClientChannel channel;
 	private String accessKey = null;
+	int queryToken = 0;
 	
 	public MarietjeClient(String host, int port, String path) {
 		this.channel = new MarietjeClientChannel(this, host, port, path);
@@ -214,6 +217,41 @@ public class MarietjeClient {
 	 */
 	public void uploadTrack(String artist, String title, FileInputStream f) {
 		throw new NotImplementedException();
+	}
+	
+	/**
+	 * Zoeken
+	 * 
+	 * @param query
+	 * @return
+	 */
+	public MarietjeTrack[] search(String query) {
+		return this.search(query, 0, 10);
+	}
+	
+	/**
+	 * Zoeken
+	 * 
+	 * @param query
+	 * @param skip
+	 * @param count
+	 * @return the list of tracks found, or null.
+	 */
+	public MarietjeTrack[] search(String query, int skip, int count) {
+		this.queryToken++;
+		try {
+			this.channel.sendMessage("{'type':'query_media', 'token':"+queryToken+
+					"'skip':"+skip+",'count':"+count+"'query':'"+query+"'}");
+			this.searchResults.acquire();
+			return this.channel.getQueryResults();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		return null;
 	}
 		
 }
