@@ -38,7 +38,7 @@ public class MarietjeClient {
 	 */
 	private final Semaphore loginAttempt = new Semaphore(0);
 	
-	private final Semaphore searchResults = new Semaphore(0);
+	private final Semaphore queryResults = new Semaphore(0);
 	
 	private final MarietjeClientChannel channel;
 	private String accessKey = null;
@@ -242,7 +242,7 @@ public class MarietjeClient {
 		try {
 			this.channel.sendMessage("{'type':'query_media', 'token':"+queryToken+
 					"'skip':"+skip+",'count':"+count+"'query':'"+query+"'}");
-			this.searchResults.acquire();
+			this.queryResults.acquire();
 			return this.channel.getQueryResults();
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -252,6 +252,10 @@ public class MarietjeClient {
 			e.printStackTrace();
 		}		
 		return null;
+	}
+
+	public Semaphore getQueryResultsRetrievedSemaphore() {
+		return this.queryResults;
 	}
 		
 }

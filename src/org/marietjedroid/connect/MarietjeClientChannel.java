@@ -83,6 +83,8 @@ class MarietjeClientChannel extends JoyceChannel {
 
 	private ArrayList<MarietjeTrack> queryResults = new ArrayList<MarietjeTrack>();
 
+	private Semaphore queryResultsRetrieved;
+
 	public MarietjeClientChannel(MarietjeClient server, String host, int port, String path) {
 		super(new JoyceRelay(new JoyceClient(host, port, path)), null);
 		
@@ -92,6 +94,7 @@ class MarietjeClientChannel extends JoyceChannel {
 		this.tracksRetrieved = server.getTracksRetrievedSemaphore();
 		this.playingRetrieved = server.getPlayingRetrievedSemaphore();
 		this.requestsRetrieved = server.getRequestsRetrievedSemaphore();
+		this.queryResultsRetrieved = server.getQueryResultsRetrievedSemaphore();
 		// TODO Auto-generated constructor stub
 	}
 
@@ -159,7 +162,7 @@ class MarietjeClientChannel extends JoyceChannel {
 					JSONObject m = results.getJSONObject(i);
 					this.queryResults.add(new MarietjeTrack(m));
 				}
-				this.queueRetrieved.release();
+				this.queryResultsRetrieved.release();
 			}
 			
 			
