@@ -1,3 +1,19 @@
+/**
+ * @licence GNU General Public licence http://www.gnu.org/copyleft/gpl.html
+ * @Copyright (C) 2012 Thom Wiggers
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.marietjedroid.connect;
 
 import java.util.ArrayList;
@@ -83,6 +99,7 @@ class MarietjeClientChannel extends MarietjeMessenger{
 	public MarietjeClientChannel(MarietjeClient server, String host, int port,
 			String path) throws MarietjeException {
 		super(host, port, path);
+		this.addObserver(server);
 		this.server = server;
 		this.loginAttempt = server.getLoginAttemptSemaphore();
 		this.queueRetrieved = server.getQueueRetrievedSemaphore();
@@ -94,8 +111,9 @@ class MarietjeClientChannel extends MarietjeMessenger{
 	}
 	
 
+	
 	/* (non-Javadoc)
-	 * @see org.thomwiggers.jjoyce.base.JoyceChannel#handleMessage(org.json.JSONObject)
+	 * @see org.marietjedroid.connect.MarietjeMessenger#handleMessage(java.lang.String, org.json.JSONObject)
 	 */
 	public synchronized void handleMessage(String token, JSONObject data)
 			throws JSONException {
@@ -170,6 +188,9 @@ class MarietjeClientChannel extends MarietjeMessenger{
 			}
 
 		}
+		
+		this.setChanged();
+		this.notifyObservers(data.getString("type"));
 	}
 
 	/**

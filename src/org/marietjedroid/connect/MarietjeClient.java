@@ -1,16 +1,34 @@
+/**
+ * @licence GNU General Public licence http://www.gnu.org/copyleft/gpl.html
+ * @Copyright (C) 2012 Thom Wiggers
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.marietjedroid.connect;
 
 import java.io.FileInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.Semaphore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MarietjeClient {
+public class MarietjeClient extends Observable implements Observer {
 	
 	private static final String DEFAULT_REQUESTER = "marietje";
 	/**
@@ -46,13 +64,19 @@ public class MarietjeClient {
 	
 	private boolean followingPlaying = false;
 	
-	public MarietjeClient(String host, int port, String path) {
-		
-		try {
-			this.channel = new MarietjeClientChannel(this, host, port, path);
-		} catch (MarietjeException e) {
-			e.printStackTrace();
-		}
+	private boolean followingQueue = true;
+	
+	/**
+	 * Creates a new instance of a connection, immediately starts polling
+	 * Marietje 
+	 * 
+	 * @param host
+	 * @param port
+	 * @param path
+	 * @throws MarietjeException
+	 */
+	public MarietjeClient(String host, int port, String path) throws MarietjeException {
+		this.channel = new MarietjeClientChannel(this, host, port, path);
 	}
 	
 	
@@ -88,15 +112,20 @@ public class MarietjeClient {
 	
 	/**
 	 * Gets the queue
+	 * Blocks until we have it
 	 * 
 	 * @return
+	 * @throws MarietjeException 
 	 */
-	public MarietjeTrack[] getQueue() {
+	public MarietjeTrack[] getQueue() throws MarietjeException {
 		ArrayList<MarietjeRequest> queue = new ArrayList<MarietjeRequest>();
 
 		try {
-			this.queueRetrieved.acquire();
-			this.channel.sendMessage(new JSONObject("{'type':'follow','which':['requests']"));
+			if(!this.followingQueue || this.channel.getRequests() == null) {
+				this.followQueue();
+				this.queueRetrieved.acquire();
+				
+			}
 			
 			JSONArray requests = this.channel.getRequests();
 			
@@ -106,12 +135,10 @@ public class MarietjeClient {
 				String requester = req.optString("byKey", DEFAULT_REQUESTER);
 				queue.add(new MarietjeRequest(requester, req.getInt("key"), media));
 			}
-			this.channel.sendMessage(new JSONObject("{'type':'unfollow','which':'[requests']}"));
-			this.queueRetrieved.release();
+			
 			
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MarietjeException("JSON Error");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -120,11 +147,48 @@ public class MarietjeClient {
 		return queue.toArray(new MarietjeTrack[0]);		
 	}
 	
-	public MarietjePlaying getPlaying() {
+	/**
+	 * Start following queue updates
+	 * 
+	 * @throws MarietjeException
+	 */
+	public void followQueue() throws MarietjeException {
+		
+		try{
+			this.channel.sendMessage("{'type':'unfollow','which':['requests']}");
+			this.followingQueue = true;
+		} catch (JSONException e) {
+			throw new MarietjeException("JSON Error");
+		} 
+	}
+	
+	/**
+	 * Stop following queue updates
+	 * 
+	 * @throws MarietjeException
+	 */
+	public void unfollowQueue() throws MarietjeException {
+		this.followingQueue = false;
+		try {
+			this.channel.sendMessage(new JSONObject("{'type':'unfollow','which':['requests']}"));
+		} catch (JSONException e) {
+			throw new MarietjeException("JSON error");
+		}
+	}
+	
+	
+	
+	/**
+	 * locks when waiting for a track
+	 * 
+	 * @return the now playing track
+	 * @throws MarietjeException 
+	 */
+	public MarietjePlaying getPlaying() throws MarietjeException {
 		MarietjePlaying nowPlaying = null;
 		try {
 			if(!followingPlaying || this.channel.getNowPlaying() == null) {
-				this.channel.sendMessage("{'type':'follow','which':['playing']}");
+				this.followPlaying();
 				this.playingRetrieved.acquire();
 			}
 			JSONObject np = this.channel.getNowPlaying();
@@ -137,19 +201,39 @@ public class MarietjeClient {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MarietjeException("JSON error");
 		}
 		
 		return nowPlaying;	
 	}
 	
-	public void unfollowNowPlaying() {
+	/**
+	 * Start following np updates
+	 * 
+	 * @throws MarietjeException
+	 */
+	public void followPlaying() throws MarietjeException {
+		try {
+			this.channel.sendMessage("{'type':'follow','which':['playing']}");
+			this.followingPlaying = true;
+		} catch (JSONException e) {
+			throw new MarietjeException("JSON error");
+		}
+		
+		
+	}
+
+
+	/**
+	 * Stop following the now playing updates
+	 * @throws MarietjeException 
+	 */
+	public void unfollowNowPlaying() throws MarietjeException {
 		try {
 			this.channel.sendMessage("{'type':'unfollow','which':'['playing']}");
+			this.followingPlaying = false;
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MarietjeException("JSON error");
 		}
 	}
 	
@@ -180,16 +264,14 @@ public class MarietjeClient {
 		try {
 			md5 = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MarietjeException("Problem with MD5 Message digest");
 		}
 		hash = md5.digest(hash.getBytes()).toString();
 		try {
 			this.channel.sendMessage("{'type':'login', 'username':'"+username+"'," 
 					+ "'hash':'"+hash+"'}");
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MarietjeException("Problem with the JSON feed");
 		}
 		try {
 			this.loginAttempt.acquire();
@@ -215,18 +297,30 @@ public class MarietjeClient {
 			throw new MarietjeException("You must log in");
 		try {
 			this.channel.sendMessage("{'type':'request','mediaKey':'"+trackid+"'}");
-			this.getQueue();
+			this.requestsRetrieved.acquire();
 			if(this.channel.getRequestError() != null) {
 				throw new MarietjeException(this.channel.getRequestError());
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 *  TODO
+	 * Upload a track
+	 * 
+	 * 
+	 * locks
+	 * 
+	 * TODO
+	 * 
+	 * @param artist
+	 * @param title
+	 * @param f
 	 */
 	public void uploadTrack(String artist, String title, FileInputStream f) {
 	}
@@ -236,8 +330,9 @@ public class MarietjeClient {
 	 * 
 	 * @param query
 	 * @return
+	 * @throws MarietjeException 
 	 */
-	public MarietjeTrack[] search(String query) {
+	public MarietjeTrack[] search(String query) throws MarietjeException {
 		return this.search(query, 0, 10);
 	}
 	
@@ -248,8 +343,9 @@ public class MarietjeClient {
 	 * @param skip
 	 * @param count
 	 * @return the list of tracks found, or null.
+	 * @throws MarietjeException 
 	 */
-	public MarietjeTrack[] search(String query, int skip, int count) {
+	public MarietjeTrack[] search(String query, int skip, int count) throws MarietjeException {
 		this.queryToken++;
 		try {
 			this.channel.sendMessage("{'type':'query_media', 'token':"+queryToken+
@@ -257,8 +353,7 @@ public class MarietjeClient {
 			this.queryResults.acquire();
 			return this.channel.getQueryResults();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MarietjeException("Problem with the JSON feed");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -266,8 +361,20 @@ public class MarietjeClient {
 		return null;
 	}
 
-	public Semaphore getQueryResultsRetrievedSemaphore() {
+	/**
+	 * @return
+	 */
+	Semaphore getQueryResultsRetrievedSemaphore() {
 		return this.queryResults;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
+	public void update(Observable o, Object arg) {
+		this.notifyObservers(arg);
+		
 	}
 		
 }

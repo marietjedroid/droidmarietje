@@ -1,3 +1,20 @@
+/**
+ * @licence GNU General Public licence http://www.gnu.org/copyleft/gpl.html
+ * @Copyright (C) 2012 Thom Wiggers
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.marietjedroid.connect;
 
 import java.io.BufferedReader;
@@ -11,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Observable;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
@@ -31,7 +49,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public abstract class MarietjeMessenger {
+/**
+ * Handles most of the messaging aspect
+ * 
+ * @author Thom
+ *
+ */
+public abstract class MarietjeMessenger  extends Observable {
 	private HttpClient httpClient = new DefaultHttpClient();
 
 	final Lock lock = new ReentrantLock();
@@ -82,6 +106,15 @@ public abstract class MarietjeMessenger {
 		}
 	}
 
+	/**
+	 * Sends a stream
+	 * 
+	 * FIXME probably massively broken
+	 * 
+	 * @param token
+	 * @param stream
+	 * @param blocking
+	 */
 	public void sendStream(String token, ContentBody stream, boolean blocking) {
 		if (!this.token.equals(token))
 			throw new IllegalArgumentException("Wrong token!");
@@ -120,6 +153,15 @@ public abstract class MarietjeMessenger {
 
 	}
 
+	/**
+	 * Sends a blocking stream, probably
+	 * massively broken
+	 * 
+	 * FIXME
+	 * 
+	 * @param token
+	 * @param stream
+	 */
 	public void sendStream(String token, ContentBody stream) {
 		this.sendStream(token, stream, true);
 	}
@@ -135,19 +177,13 @@ public abstract class MarietjeMessenger {
 	}
 
 	/**
-	 * 
+	 * Acts on incoming messages
 	 * 
 	 * @author Thom
 	 * 
 	 */
 	private class MessageDispatcher implements Runnable {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Runnable#run()
-		 */
-		@Override
 		public void run() {
 			while (running) {
 				lock.lock();
@@ -171,6 +207,12 @@ public abstract class MarietjeMessenger {
 
 	}
 
+	/**
+	 * Keeps polling marietje
+	 * 
+	 * @author Thom
+	 *
+	 */
 	private class Requester implements Runnable {
 
 		/*
@@ -178,7 +220,6 @@ public abstract class MarietjeMessenger {
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
-		@Override
 		public void run() {
 			while (running) {
 				JSONObject[] data = null;
@@ -220,6 +261,11 @@ public abstract class MarietjeMessenger {
 		}
 	}
 
+	/**
+	 * Starts running the threads
+	 * 
+	 * @throws MarietjeException
+	 */
 	public void run() throws MarietjeException {
 		if (this.running)
 			throw new IllegalStateException("Already running");
@@ -234,10 +280,11 @@ public abstract class MarietjeMessenger {
 		Thread t2 = new Thread(new Requester());
 		t2.setDaemon(true);
 		t2.start();
-		System.out.println("MarietjeMessenger.run()");
 	}
 
 	/**
+	 * Sends a request and handles the response
+	 * 
 	 * @param list
 	 * @throws MarietjeException
 	 */
@@ -323,6 +370,7 @@ public abstract class MarietjeMessenger {
 	}
 
 	/**
+	 * Handle an imcoming message
 	 * 
 	 * @param token
 	 * @param message
@@ -330,8 +378,17 @@ public abstract class MarietjeMessenger {
 	protected abstract void handleMessage(String token, JSONObject message)
 			throws JSONException;
 
+	/**
+	 * Retrieve a stream
+	 * 
+	 * 
+	 * @param streamId
+	 */
 	protected abstract void retrieveStream(int streamId);
 
+	/**
+	 * Stop
+	 */
 	public void stop() {
 		this.running = false;
 		this.messageInSemaphore.notifyAll();
