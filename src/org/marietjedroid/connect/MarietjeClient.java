@@ -9,8 +9,6 @@ import java.util.concurrent.Semaphore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.thomwiggers.Jjoyce.base.JoyceChannel;
-import org.thomwiggers.Jjoyce.base.NotImplementedException;
 
 public class MarietjeClient {
 	
@@ -40,17 +38,23 @@ public class MarietjeClient {
 	
 	private final Semaphore queryResults = new Semaphore(0);
 	
-	private final MarietjeClientChannel channel;
+	private MarietjeClientChannel channel = null;
+	
 	private String accessKey = null;
+	
 	int queryToken = 0;
 	
+	private boolean followingPlaying = false;
+	
 	public MarietjeClient(String host, int port, String path) {
-		this.channel = new MarietjeClientChannel(this, host, port, path);
+		
+		try {
+			this.channel = new MarietjeClientChannel(this, host, port, path);
+		} catch (MarietjeException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	JoyceChannel getChannel() {
-		return channel;
-	}
 	
 	/**
 	 * 
@@ -119,16 +123,16 @@ public class MarietjeClient {
 	public MarietjePlaying getPlaying() {
 		MarietjePlaying nowPlaying = null;
 		try {
-			
-			this.channel.sendMessage("{'type':'follow','which':['playing']}");
-			this.playingRetrieved.acquire();
+			if(!followingPlaying || this.channel.getNowPlaying() == null) {
+				this.channel.sendMessage("{'type':'follow','which':['playing']}");
+				this.playingRetrieved.acquire();
+			}
 			JSONObject np = this.channel.getNowPlaying();
 			JSONObject media = np.getJSONObject("media");
-			double servertime = np.getDouble("servertime");
-			double endtime = np.getDouble("endtime");
+			double servertime = np.getDouble("serverTime");
+			double endtime = np.getDouble("endTime");
 			String byKey = np.getString("byKey");
 			nowPlaying = new MarietjePlaying(byKey,servertime, endtime, media);
-			this.channel.sendMessage("{'type':'unfollow','which':'['playing']}");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -138,6 +142,15 @@ public class MarietjeClient {
 		}
 		
 		return nowPlaying;	
+	}
+	
+	public void unfollowNowPlaying() {
+		try {
+			this.channel.sendMessage("{'type':'unfollow','which':'['playing']}");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -216,7 +229,6 @@ public class MarietjeClient {
 	 *  TODO
 	 */
 	public void uploadTrack(String artist, String title, FileInputStream f) {
-		throw new NotImplementedException();
 	}
 	
 	/**

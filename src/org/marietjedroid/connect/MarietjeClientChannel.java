@@ -7,12 +7,8 @@ import java.util.concurrent.Semaphore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.thomwiggers.Jjoyce.base.JoyceChannel;
-import org.thomwiggers.Jjoyce.base.JoyceClient;
-import org.thomwiggers.Jjoyce.base.JoyceHub;
-import org.thomwiggers.Jjoyce.base.JoyceRelay;
 
-class MarietjeClientChannel extends JoyceChannel {
+class MarietjeClientChannel extends MarietjeMessenger{
 
 	/**
 	 * TODO determine kind of object
@@ -22,7 +18,6 @@ class MarietjeClientChannel extends JoyceChannel {
 	/**
 	 * Contains tracklist recieved from maried
 	 * 
-	 * TODO Determine kind of object and use of _partialMedia in python version
 	 */
 	private JSONArray[] partialMedia;
 
@@ -47,47 +42,47 @@ class MarietjeClientChannel extends JoyceChannel {
 	private MarietjeException loginError;
 
 	/**
-	 * request errors 
+	 * request errors
 	 */
 	private String requestError = null;
-	
+
 	/**
 	 * The currently playing track
 	 */
 	private JSONObject nowPlaying;
 
 	/**
-	 * Access Key 
+	 * Access Key
 	 */
 	private String accessKey;
 
 	/**
 	 * Easy access to the semaphore of MarietjeClient
 	 */
-	private final Semaphore tracksRetrieved;
+	private Semaphore tracksRetrieved;
 	/**
 	 * Easy access to the semaphore of MarietjeClient
 	 */
-	private final Semaphore playingRetrieved;
-	
+	private Semaphore playingRetrieved;
+
 	/**
-	 * Easy access to the semaphore of MarietjeClient 
+	 * Easy access to the semaphore of MarietjeClient
 	 */
-	private final Semaphore requestsRetrieved;
-	
-	private final Semaphore queueRetrieved;
+	private Semaphore requestsRetrieved;
+
+	private Semaphore queueRetrieved;
 
 	private JSONArray requests;
 
-	private final Semaphore loginAttempt;
+	private Semaphore loginAttempt;
 
 	private ArrayList<MarietjeTrack> queryResults = new ArrayList<MarietjeTrack>();
 
 	private Semaphore queryResultsRetrieved;
 
-	public MarietjeClientChannel(MarietjeClient server, String host, int port, String path) {
-		super(new JoyceRelay(new JoyceClient(host, port, path)), null);
-		
+	public MarietjeClientChannel(MarietjeClient server, String host, int port,
+			String path) throws MarietjeException {
+		super(host, port, path);
 		this.server = server;
 		this.loginAttempt = server.getLoginAttemptSemaphore();
 		this.queueRetrieved = server.getQueueRetrievedSemaphore();
@@ -95,34 +90,42 @@ class MarietjeClientChannel extends JoyceChannel {
 		this.playingRetrieved = server.getPlayingRetrievedSemaphore();
 		this.requestsRetrieved = server.getRequestsRetrievedSemaphore();
 		this.queryResultsRetrieved = server.getQueryResultsRetrievedSemaphore();
-		// TODO Auto-generated constructor stub
+		this.run();
 	}
+	
 
-	public synchronized void handleMessage(JSONObject data) throws JSONException {
+	/* (non-Javadoc)
+	 * @see org.thomwiggers.jjoyce.base.JoyceChannel#handleMessage(org.json.JSONObject)
+	 */
+	public synchronized void handleMessage(String token, JSONObject data)
+			throws JSONException {
 		if (data.getString("type").equals("media_part")) {
 			synchronized (tracksRetrieved) {
 				JSONObject ding = data.getJSONObject("part");
 
 				@SuppressWarnings("unchecked")
-				Iterator<String> it  = ding.keys();
-				while(it.hasNext())
-					tempPartialMedia.add(ding.getJSONArray((it.next().toString())));
-				if(this.partialMediaSize == tempPartialMedia.size()){
-					this.partialMedia = tempPartialMedia.toArray(new JSONArray[0]);
+				Iterator<String> it = ding.keys();
+				while (it.hasNext())
+					tempPartialMedia.add(ding.getJSONArray((it.next()
+							.toString())));
+				if (this.partialMediaSize == tempPartialMedia.size()) {
+					this.partialMedia = tempPartialMedia
+							.toArray(new JSONArray[0]);
 					this.tempPartialMedia.clear();
 					this.partialMediaSize = -1;
 					tracksRetrieved.release();
 				}
-				
+
 			}
 		} else if (data.getString("type").equals("media")) {
-			synchronized(tracksRetrieved) {
+			synchronized (tracksRetrieved) {
 				this.partialMediaSize = data.getInt("count");
-				if(this.partialMediaSize == tempPartialMedia.size()) {
-					this.partialMedia = tempPartialMedia.toArray(new JSONArray[0]);
+				if (this.partialMediaSize == tempPartialMedia.size()) {
+					this.partialMedia = tempPartialMedia
+							.toArray(new JSONArray[0]);
 					this.tempPartialMedia.clear();
 					this.partialMediaSize = 0;
-					tracksRetrieved.release();	
+					tracksRetrieved.release();
 				}
 			}
 		} else if (data.getString("type").equals("welcome"))
@@ -132,19 +135,20 @@ class MarietjeClientChannel extends JoyceChannel {
 				this.nowPlaying = data.getJSONObject("playing");
 				playingRetrieved.release();
 			}
-		} else if (data.getString("type").equals("requests")){
-			synchronized(queueRetrieved) {
-					this.requests = data.getJSONArray("requests");
-					this.requestsRetrieved.release();
-				}
-			
+		} else if (data.getString("type").equals("requests")) {
+			synchronized (queueRetrieved) {
+				this.requests = data.getJSONArray("requests");
+				this.requestsRetrieved.release();
+			}
+
 		} else if (data.getString("type").equals("error_login")) {
-			synchronized(loginAttempt) {
-				this.loginError = new MarietjeException (data.getString("message"));
+			synchronized (loginAttempt) {
+				this.loginError = new MarietjeException(
+						data.getString("message"));
 				this.loginAttempt.release();
 			}
 		} else if (data.getString("type").equals("logged_in")) {
-			synchronized(loginAttempt) {
+			synchronized (loginAttempt) {
 				this.accessKey = data.getString("accessKey");
 				loginAttempt.release();
 			}
@@ -152,25 +156,26 @@ class MarietjeClientChannel extends JoyceChannel {
 			this.requestError = data.getString("message");
 			this.requestsRetrieved.release();
 		} else if (data.getString("type").equals("query_media_results")) {
-			if(data.getInt("token") != server.queryToken) {
+			if (data.getInt("token") != server.queryToken) {
 				return; // wrong result set
-			} 
+			}
 			synchronized (this.queryResults) {
 				this.queryResults.clear();
 				JSONArray results = data.getJSONArray("results");
-				for(int i = 0; results.opt(i) != null; i++) {
+				for (int i = 0; results.opt(i) != null; i++) {
 					JSONObject m = results.getJSONObject(i);
 					this.queryResults.add(new MarietjeTrack(m));
 				}
 				this.queryResultsRetrieved.release();
 			}
-			
-			
+
 		}
 	}
-	
-	
-	JSONArray getRequests () {
+
+	/**
+	 * @return requests
+	 */
+	JSONArray getRequests() {
 		return this.requests;
 	}
 
@@ -209,12 +214,25 @@ class MarietjeClientChannel extends JoyceChannel {
 		return requestError;
 	}
 
+	/**
+	 * @return query results
+	 */
 	public MarietjeTrack[] getQueryResults() {
 		return this.queryResults.toArray(new MarietjeTrack[0]);
-		
+
+	}
+	
+	public void sendMessage(String json) throws JSONException{
+		this.sendMessage(new JSONObject(json));
 	}
 
 
 
+
+	@Override
+	protected void retrieveStream(int streamId) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
