@@ -7,14 +7,11 @@ import android.widget.TextView;
 
 public class SongListener implements OnClickListener {
 
-	
-	
-	@Override
 	public void onClick(View v) {
-		
-		TextView tv = (TextView)v.findViewById(R.id.title);
-		Log.d("Onclick", "with id: "+ tv.getText().toString());
-		
+
+		TextView tv = (TextView) v.findViewById(R.id.title);
+		Log.d("Onclick", "with id: " + tv.getText().toString());
+
 	}
 
 }
