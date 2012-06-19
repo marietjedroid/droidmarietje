@@ -115,7 +115,7 @@ class MarietjeClientChannel extends MarietjeMessenger{
 	/* (non-Javadoc)
 	 * @see org.marietjedroid.connect.MarietjeMessenger#handleMessage(java.lang.String, org.json.JSONObject)
 	 */
-	public synchronized void handleMessage(String token, JSONObject data)
+	public void handleMessage(String token, JSONObject data)
 			throws JSONException {
 		if (data.getString("type").equals("media_part")) {
 			synchronized (tracksRetrieved) {
@@ -149,15 +149,12 @@ class MarietjeClientChannel extends MarietjeMessenger{
 		} else if (data.getString("type").equals("welcome"))
 			return;
 		else if (data.getString("type").equals("playing")) {
-			synchronized (playingRetrieved) {
-				this.nowPlaying = data.getJSONObject("playing");
-				playingRetrieved.release();
-			}
+			this.nowPlaying = data.getJSONObject("playing");
+			playingRetrieved.release();
 		} else if (data.getString("type").equals("requests")) {
-			synchronized (requestsRetrieved) {
-				this.requests = data.getJSONArray("requests");
-				this.requestsRetrieved.release();
-			}
+			this.requests = data.getJSONArray("requests");
+			this.requestsRetrieved.release();
+			
 
 		} else if (data.getString("type").equals("error_login")) {
 			synchronized (loginAttempt) {

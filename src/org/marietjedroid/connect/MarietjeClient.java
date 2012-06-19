@@ -59,7 +59,7 @@ public class MarietjeClient extends Observable implements Observer {
 	
 	private boolean followingPlaying = false;
 	
-	private boolean followingQueue = true;
+	private boolean followingQueue = false;
 	
 	/**
 	 * Creates a new instance of a connection, immediately starts polling

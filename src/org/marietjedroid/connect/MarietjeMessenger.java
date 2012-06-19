@@ -18,6 +18,7 @@
 package org.marietjedroid.connect;
 
 import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -49,6 +50,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import android.util.Log;
+
 /**
  * Handles most of the messaging aspect
  * 
@@ -72,7 +75,9 @@ public abstract class MarietjeMessenger extends Observable {
 	private Queue<JSONObject> queueMessageIn = new LinkedList<JSONObject>();
 
 	private Queue<JSONObject> queueOut = new LinkedList<JSONObject>();
-
+	
+	private Semaphore messagesInSemaphore = new Semaphore(1);
+	
 	private int nPending = 0;
 
 	private final String host;
@@ -183,26 +188,35 @@ public abstract class MarietjeMessenger extends Observable {
 	private class MessageDispatcher implements Runnable {
 
 		public void run() {
+			try {
+				messagesInSemaphore.acquire();
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			while (running) {
-				lock.lock();
-				try {
-					while (!queueMessageIn.isEmpty()) {
-						try {
-							handleMessage(token, queueMessageIn.poll());
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+				while (!queueMessageIn.isEmpty()) {
+					try {
+
+						JSONObject data = queueMessageIn.poll();
+						System.out.println("passing to handle: " + data
+								+ " queue size: " + queueMessageIn.size());
+						handleMessage(token, data);
+						System.out.println("arg.");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
+				}
+			messagesInSemaphore.release();
+				try {
 					messageInSemaphore.acquire();
 				} catch (InterruptedException e) {
-				} finally {
-					lock.unlock();
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-
 			}
 		}
-
 	}
 
 	/**
@@ -222,7 +236,6 @@ public abstract class MarietjeMessenger extends Observable {
 			while (running) {
 
 				JSONObject[] data = null;
-				lock.lock();
 				if ((queueOut.isEmpty() || token == null) && nPending > 0) {
 					try {
 						outSemaphore.acquire();
@@ -253,7 +266,6 @@ public abstract class MarietjeMessenger extends Observable {
 					}
 				}
 				nPending--;
-				lock.unlock();
 			}
 
 		}
@@ -268,7 +280,7 @@ public abstract class MarietjeMessenger extends Observable {
 		if (this.running)
 			throw new IllegalStateException("Already running");
 		this.running = true;
-		if (this.token == null) {
+		if (this.token != null) {
 			this.doRequest(null);
 		}
 		Thread t1 = new Thread(new MessageDispatcher());
@@ -324,13 +336,17 @@ public abstract class MarietjeMessenger extends Observable {
 				sb.append(line);
 			}
 		} catch (IOException e) {
-			throw new MarietjeException("Connection stuk!" + e.getMessage());
+			MarietjeException tr = new MarietjeException("Connection stuk!"
+					+ e.getMessage());
+			System.out.println("KAPOT");
+			throw tr;
 		}
 
 		JSONArray d = null;
 		try {
 			d = new JSONArray(new JSONTokener(sb.toString()));
 		} catch (JSONException e) {
+			throw new MarietjeException("Ja, kapot!");
 		}
 
 		if (d == null || d.length() != 3)
@@ -353,7 +369,13 @@ public abstract class MarietjeMessenger extends Observable {
 				this.outSemaphore.release();
 			}
 		}
-
+		
+		try {
+			messagesInSemaphore.acquire();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		for (int i = 0; i < msgs.length(); i++) {
 			try {
 				this.queueMessageIn.add(msgs.getJSONObject(i));
@@ -361,6 +383,8 @@ public abstract class MarietjeMessenger extends Observable {
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} finally {
+				messagesInSemaphore.release();
 			}
 		}
 
@@ -389,9 +413,12 @@ public abstract class MarietjeMessenger extends Observable {
 	 * Stop
 	 */
 	public void stop() {
-		this.running = false;
-		this.messageInSemaphore.notifyAll();
-		this.outSemaphore.notifyAll();
+		System.out.println("Stopping");
+		
+		 this.running = false;
+		 this.messageInSemaphore.notifyAll();
+		 this.outSemaphore.notifyAll();
+		 
 	}
 
 }
