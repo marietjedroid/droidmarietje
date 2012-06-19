@@ -1,6 +1,8 @@
 package org.marietjedroid.droidmarietje;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import org.marietjedroid.connect.MarietjeClient;
 import org.marietjedroid.connect.MarietjeException;
@@ -24,7 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MarietjeDroidActivity extends Activity implements OnClickListener {
+public class MarietjeDroidActivity extends Activity implements OnClickListener, Observer {
 
 	private static MarietjeClient mc = null;
 	private static MarietjeTrack[] playlist = null;
@@ -53,7 +55,8 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		durationlist = new ArrayList<TextView>();
 
 		try {
-			mc = new MarietjeClient("localhost", 1234, "");
+			mc = new MarietjeClient("192.168.56.101", 8080, "");
+			mc.addObserver(this);
 		} catch (MarietjeException e) {
 
 			Toast t = Toast.makeText(this.getApplicationContext(),
@@ -63,6 +66,21 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 
 		updateCurrentlyPlaying();
 
+		updateQueue();
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_dropdown_item_1line, SONGS);
+		requesttxt = (AutoCompleteTextView) findViewById(R.id.requesttext);
+		requesttxt.setAdapter(adapter);
+
+		((Button) findViewById(R.id.requestbutton)).setOnClickListener(this);
+		findViewById(R.id.currentlyplayingwrap).requestFocus();
+
+		mHandler.removeCallbacks(mUpdateTimeTask);
+		mHandler.postDelayed(mUpdateTimeTask, 1000);
+	}
+	
+	private void updateQueue() {
 		try {
 			playlist = mc.getQueue();
 		} catch (MarietjeException e) {
@@ -88,23 +106,13 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 			((TextView) v.findViewById(R.id.artist)).setText(mt.getArtist());
 
 			TextView duration = (TextView) v.findViewById(R.id.tracklength);
-			duration.setText(mt.getTrackStringLength());
+			duration.setText(mt.getTrackLengthString());
 
 			durationlist.add(duration);
 
 			muzieklijst.addView(v);
 		}
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_dropdown_item_1line, SONGS);
-		requesttxt = (AutoCompleteTextView) findViewById(R.id.requesttext);
-		requesttxt.setAdapter(adapter);
-
-		((Button) findViewById(R.id.requestbutton)).setOnClickListener(this);
-		findViewById(R.id.currentlyplayingwrap).requestFocus();
-
-		mHandler.removeCallbacks(mUpdateTimeTask);
-		mHandler.postDelayed(mUpdateTimeTask, 1000);
 	}
 
 	private Runnable mUpdateTimeTask = new Runnable() {
@@ -113,8 +121,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 			for (int i = 0; i < durationlist.size(); i++) {
 				TextView tv = durationlist.get(i);
 				MarietjeTrack track = playlist[i];
-				track.decreaseTime();
-				tv.setText(track.getTrackStringLength());
+				tv.setText(track.getTrackLengthString());
 			}
 
 			mHandler.postDelayed(this, 1000);
@@ -151,7 +158,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 	}
 
 	public static void setTimeLeft(TextView duration, MarietjeTrack mt) {
-		duration.setText(mt.getTrackStringLength());
+		duration.setText(mt.getTrackLengthString());
 	}
 
 	private void updateCurrentlyPlaying() {
@@ -173,6 +180,16 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 
 	public void onClick(View v) {
 		Log.d("Request", requesttxt.getText().toString());
+	}
+
+	public void update(Observable arg0, Object arg1) {
+		// TODO Auto-generated method stub
+		// TODO Updaten van ding wat binnenkomt
+		// Wat vooral belangrijk is, is dat hij het binnenkomende type doorstuurt  naar hier als arg1
+		// zie handleMessage(String msg) in MarietjeClientChannel.java voor de types.
+		updateCurrentlyPlaying();
+		updateQueue();
+		
 	}
 
 }

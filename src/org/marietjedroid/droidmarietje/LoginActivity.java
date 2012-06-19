@@ -33,13 +33,13 @@ public class LoginActivity extends Activity implements OnClickListener {
 		String username = txtUsername.getText().toString();
 		String password = txtPassword.getText().toString();
 
-		if (username.isEmpty() || password.isEmpty()) {
+		if (username.equals("") || password.equals("")) {
 			// not all fields have been filled out
 			return;
 		}
 
 		try {
-			mc.login(username, password);
+			mc.login(username, password); // TODO pas op, locks
 			Log.i("Login", "Success");
 		} catch (MarietjeException me) {
 			Log.e("Login", "Failed");

@@ -18,6 +18,8 @@ package org.marietjedroid.connect;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.Semaphore;
 
 import org.json.JSONArray;
@@ -86,7 +88,6 @@ class MarietjeClientChannel extends MarietjeMessenger{
 	 */
 	private Semaphore requestsRetrieved;
 
-	private Semaphore queueRetrieved;
 
 	private JSONArray requests;
 
@@ -102,7 +103,6 @@ class MarietjeClientChannel extends MarietjeMessenger{
 		this.addObserver(server);
 		this.server = server;
 		this.loginAttempt = server.getLoginAttemptSemaphore();
-		this.queueRetrieved = server.getQueueRetrievedSemaphore();
 		this.tracksRetrieved = server.getTracksRetrievedSemaphore();
 		this.playingRetrieved = server.getPlayingRetrievedSemaphore();
 		this.requestsRetrieved = server.getRequestsRetrievedSemaphore();
@@ -154,7 +154,7 @@ class MarietjeClientChannel extends MarietjeMessenger{
 				playingRetrieved.release();
 			}
 		} else if (data.getString("type").equals("requests")) {
-			synchronized (queueRetrieved) {
+			synchronized (requestsRetrieved) {
 				this.requests = data.getJSONArray("requests");
 				this.requestsRetrieved.release();
 			}
@@ -255,5 +255,6 @@ class MarietjeClientChannel extends MarietjeMessenger{
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }

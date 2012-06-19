@@ -79,7 +79,10 @@ public class MarietjeTrack {
 		return trackKey;
 	}
 	
-	public String getTrackStringLength(){
+	/**
+	 * @return track length as a string
+	 */
+	public String getTrackLengthString(){
 		return timeToString(this.length);
 	}
 	

@@ -53,9 +53,9 @@ import org.json.JSONTokener;
  * Handles most of the messaging aspect
  * 
  * @author Thom
- *
+ * 
  */
-public abstract class MarietjeMessenger  extends Observable {
+public abstract class MarietjeMessenger extends Observable {
 	private HttpClient httpClient = new DefaultHttpClient();
 
 	final Lock lock = new ReentrantLock();
@@ -100,8 +100,10 @@ public abstract class MarietjeMessenger  extends Observable {
 		SecureRandom random = new SecureRandom();
 		while (true) {
 			String attempt = new BigInteger(130, random).toString();
-			attempt = org.apache.commons.codec.binary.Base64
-					.encodeBase64String(attempt.getBytes()).substring(0, 6);
+			attempt = new String(
+					org.apache.commons.codec.binary.Base64.encodeBase64(attempt
+							.getBytes())).substring(0, 7);
+
 			return attempt;
 		}
 	}
@@ -131,9 +133,6 @@ public abstract class MarietjeMessenger  extends Observable {
 			public void run() {
 				try {
 					httpClient.execute(post);
-				} catch (ClientProtocolException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -154,8 +153,7 @@ public abstract class MarietjeMessenger  extends Observable {
 	}
 
 	/**
-	 * Sends a blocking stream, probably
-	 * massively broken
+	 * Sends a blocking stream, probably massively broken
 	 * 
 	 * FIXME
 	 * 
@@ -211,7 +209,7 @@ public abstract class MarietjeMessenger  extends Observable {
 	 * Keeps polling marietje
 	 * 
 	 * @author Thom
-	 *
+	 * 
 	 */
 	private class Requester implements Runnable {
 
@@ -222,40 +220,40 @@ public abstract class MarietjeMessenger  extends Observable {
 		 */
 		public void run() {
 			while (running) {
-				JSONObject[] data = null;
-				synchronized(queueOut) {
-					if ((queueOut.isEmpty() || token == null) && nPending > 0) {
-						try {
-							outSemaphore.acquire();
-						} catch (InterruptedException e) {
-						}
-						if (!running)
-							return;
-						continue;
-					}
-					nPending++;
 
-					if (!queueOut.isEmpty()) {
-						data = queueOut.toArray(new JSONObject[0]);
-						queueOut.clear();
+				JSONObject[] data = null;
+				lock.lock();
+				if ((queueOut.isEmpty() || token == null) && nPending > 0) {
+					try {
+						outSemaphore.acquire();
+					} catch (InterruptedException e) {
 					}
-					if (data != null) {
-						try {
-							doRequest(Arrays.asList(data));
-						} catch (MarietjeException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					} else {
-						try {
-							doRequest(null);
-						} catch (MarietjeException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					nPending--;
+					if (!running)
+						return;
+					continue;
 				}
+				nPending++;
+
+				if (!queueOut.isEmpty()) {
+					data = queueOut.toArray(new JSONObject[0]);
+					queueOut.clear();
+				}
+				if (data != null) {
+					try {
+						doRequest(Arrays.asList(data));
+					} catch (MarietjeException e) {
+						stop();
+					}
+				} else {
+					try {
+						doRequest(null);
+					} catch (MarietjeException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				nPending--;
+				lock.unlock();
 			}
 
 		}
@@ -289,11 +287,11 @@ public abstract class MarietjeMessenger  extends Observable {
 	 * @throws MarietjeException
 	 */
 	private void doRequest(List<JSONObject> list) throws MarietjeException {
-		if (list != null )
+		if (list != null)
 			list = new ArrayList<JSONObject>(list);
-		else 
+		else
 			list = new ArrayList<JSONObject>();
-		
+
 		HttpClient httpClient = new DefaultHttpClient();
 		if (this.token == null) {
 			throw new IllegalStateException("token is null");
@@ -305,9 +303,9 @@ public abstract class MarietjeMessenger  extends Observable {
 			json.put(m);
 		HttpGet hp = null;
 		try {
-			System.out.println("JSON: "+json.toString());
-			String url = String.format("http://%s:%s%s?m=%s", host, port,
-					path, URLEncoder.encode(json.toString(), "UTF-8"));
+			System.out.println("JSON: " + json.toString());
+			String url = String.format("http://%s:%s%s?m=%s", host, port, path,
+					URLEncoder.encode(json.toString(), "UTF-8"));
 			System.out.println("url: " + url);
 			hp = new HttpGet(url);
 		} catch (UnsupportedEncodingException e1) {
@@ -326,6 +324,7 @@ public abstract class MarietjeMessenger  extends Observable {
 				sb.append(line);
 			}
 		} catch (IOException e) {
+			throw new MarietjeException("Connection stuk!" + e.getMessage());
 		}
 
 		JSONArray d = null;

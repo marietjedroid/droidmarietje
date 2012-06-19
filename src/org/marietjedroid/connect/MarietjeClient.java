@@ -45,11 +45,6 @@ public class MarietjeClient extends Observable implements Observer {
 	private final Semaphore requestsRetrieved = new Semaphore(0);
 	
 	/**
-	 * Blocks until the queue has been retrieved.
-	 */
-	private final Semaphore queueRetrieved = new Semaphore(0);
-	
-	/**
 	 * Blocks until we get answer from a login attempt 
 	 */
 	private final Semaphore loginAttempt = new Semaphore(0);
@@ -99,13 +94,6 @@ public class MarietjeClient extends Observable implements Observer {
 		return requestsRetrieved;
 	}
 
-	/**
-	 * @return the queueRetrieved
-	 */
-	Semaphore getQueueRetrievedSemaphore() {
-		return queueRetrieved;
-	}
-
 	Semaphore getLoginAttemptSemaphore() {
 		return loginAttempt;
 	}
@@ -123,7 +111,7 @@ public class MarietjeClient extends Observable implements Observer {
 		try {
 			if(!this.followingQueue || this.channel.getRequests() == null) {
 				this.followQueue();
-				this.queueRetrieved.acquire();
+				this.requestsRetrieved.acquire();
 				
 			}
 			
@@ -155,7 +143,7 @@ public class MarietjeClient extends Observable implements Observer {
 	public void followQueue() throws MarietjeException {
 		
 		try{
-			this.channel.sendMessage("{'type':'unfollow','which':['requests']}");
+			this.channel.sendMessage("{'type':'follow','which':['requests']}");
 			this.followingQueue = true;
 		} catch (JSONException e) {
 			throw new MarietjeException("JSON Error");
@@ -373,8 +361,16 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
 	public void update(Observable o, Object arg) {
+		this.setChanged();
 		this.notifyObservers(arg);
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.util.Observable#addObserver(java.util.Observer)
+	 */
+	public void addObserver(Observer o) {
+		super.addObserver(o);
 	}
 		
 }
