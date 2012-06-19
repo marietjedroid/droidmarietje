@@ -16,6 +16,7 @@
  */
 package org.marietjedroid.connect;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MarietjePlaying extends MarietjeTrack {
@@ -27,7 +28,8 @@ public class MarietjePlaying extends MarietjeTrack {
 	 */
 	public MarietjePlaying(String byKey, double servertime, double endtime, JSONObject media ) {
 		super(media);
-		// TODO Auto-generated constructor stub
+		this.serverTime = servertime;
+		this.endTime = endtime;
 	}
 	
 	/**

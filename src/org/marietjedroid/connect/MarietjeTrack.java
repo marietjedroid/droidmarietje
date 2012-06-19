@@ -79,30 +79,8 @@ public class MarietjeTrack {
 		return trackKey;
 	}
 	
-	/**
-	 * @return track length as a string
-	 */
-	public String getTrackLengthString(){
-		return timeToString(this.length);
-	}
-	
 
-	private static String timeToString(double time){
-		double seconds = time / 1000;
-    	int minutes = (int)(seconds / 60);
-    	int seconds_i = (int)(seconds % 60);
-    	
-    	String sec_s;
-    	if(seconds_i < 10){
-    		sec_s = "0" + seconds_i;
-    	}
-    	else{
-    		sec_s = "" + seconds_i;
-    	}
-    	
-    	return minutes + ":" + sec_s;
-		
-	}
+	
 	
 	/**
 	 * @param key

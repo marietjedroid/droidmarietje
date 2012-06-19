@@ -1,11 +1,13 @@
 package org.marietjedroid.droidmarietje;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
 import org.marietjedroid.connect.MarietjeClient;
 import org.marietjedroid.connect.MarietjeException;
+import org.marietjedroid.connect.MarietjePlaying;
 import org.marietjedroid.connect.MarietjeTrack;
 
 import android.app.Activity;
@@ -31,6 +33,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 
 	private static MarietjeClient mc = null;
 	private static MarietjeTrack[] playlist = null;
+	MarietjePlaying currentlyPlaying;
 
 	private static final String[] SONGS = new String[] {
 			"Nothing Else Matters", "One", "Enter Sandman", "Fade to Black",
@@ -78,22 +81,30 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 		((Button) findViewById(R.id.requestbutton)).setOnClickListener(this);
 		findViewById(R.id.currentlyplayingwrap).requestFocus();
 
-		mHandler.removeCallbacks(mUpdateTimeTask);
-		mHandler.postDelayed(mUpdateTimeTask, 1000);
+		mHandler.removeCallbacks(mUpdateCurrentlyPlaying);
+		mHandler.postDelayed(mUpdateCurrentlyPlaying, 1000);
+		mHandler.removeCallbacks(mUpdateQueue);
+		mHandler.postDelayed(mUpdateQueue, 800);
+
 	}
 
 	private void updateQueue() {
 		try {
 			playlist = mc.getQueue();
+
 		} catch (MarietjeException e) {
 			Toast t = Toast.makeText(this.getApplicationContext(),
 					"Kon de afspeellijst niet ophalen", Toast.LENGTH_LONG);
 			t.show();
 		}
-		/*synchronized (durationlist) {
+		synchronized (durationlist) {
 			ViewGroup muzieklijst = (ViewGroup) findViewById(R.id.muzieklijstview);
 			SongListener sl = new SongListener();
 			durationlist.clear();
+			muzieklijst.removeAllViews();
+			muzieklijst.refreshDrawableState();
+			double totalLength = (currentlyPlaying.getEndTime() - currentlyPlaying.getServerTime() + 
+					(currentlyPlaying.getServerTime()-System.currentTimeMillis()/1000));
 
 			for (MarietjeTrack mt : playlist) {
 				View v = LayoutInflater.from(this).inflate(R.layout.muziekitem,
@@ -112,27 +123,47 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 						.setText(mt.getArtist());
 
 				TextView duration = (TextView) v.findViewById(R.id.tracklength);
-				duration.setText(mt.getTrackLengthString());
+
+				duration.setText(militimeToString(totalLength * 1000));
+				totalLength += mt.getLength();
 
 				durationlist.add(duration);
 
 				muzieklijst.addView(v);
 			}
-		}*/
+		}
 
 	}
 
-	private Runnable mUpdateTimeTask = new Runnable() {
+	private String militimeToString(double time) {
+		double seconds = time / 1000;
+		int minutes = (int) (seconds / 60);
+		int seconds_i = (int) (seconds % 60);
 
+		String sec_s;
+		if (seconds_i < 10) {
+			sec_s = "0" + seconds_i;
+		} else {
+			sec_s = "" + seconds_i;
+		}
+
+		return minutes + ":" + sec_s;
+
+	}
+
+	private Runnable mUpdateCurrentlyPlaying = new Runnable() {
 		public void run() {
-			for (int i = 0; i < durationlist.size(); i++) {
-				TextView tv = durationlist.get(i);
-				MarietjeTrack track = playlist[i];
-				tv.setText(track.getTrackLengthString());
-			}
+			updateCurrentlyPlaying();
 
 			mHandler.postDelayed(this, 1000);
+		}
+	};
 
+	private Runnable mUpdateQueue = new Runnable() {
+		public void run() {
+			updateQueue();
+
+			mHandler.postDelayed(this, 1000);
 		}
 	};
 
@@ -167,17 +198,15 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 		}
 	}
 
-	public static void setTimeLeft(TextView duration, MarietjeTrack mt) {
-		duration.setText(mt.getTrackLengthString());
-	}
-
 	private void updateCurrentlyPlaying() {
-		MarietjeTrack currentlyPlaying;
 		String artist = "";
 		String title = "";
-		
+
 		try {
-			currentlyPlaying = mc.getPlaying();
+			MarietjePlaying mp = mc.getPlaying();
+			if (mp == currentlyPlaying)
+				return;
+			currentlyPlaying = mp;
 			artist = currentlyPlaying.getArtist();
 			title = currentlyPlaying.getTitle();
 		} catch (MarietjeException e) {
@@ -185,9 +214,9 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 					"Kon niet ophalen", Toast.LENGTH_LONG);
 			t.show();
 		} finally {
-			/*synchronized (txtCurrentlyPlaying) {
+			synchronized (txtCurrentlyPlaying) {
 				txtCurrentlyPlaying.setText(artist + " - " + title);
-			}*/
+			}
 		}
 	}
 
@@ -202,12 +231,11 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 		// doorstuurt naar hier als arg1
 		// zie handleMessage(String msg) in MarietjeClientChannel.java voor de
 		// types.
-		Log.d("update", "update " + arg1.toString());
-		System.out.println("UPDATE!");
-		if(arg1.equals("playing"))
-			updateCurrentlyPlaying();
-		if(arg1.equals("requests"))
-			updateQueue();
+		/*
+		 * Log.d("update", "update " + arg1.toString());
+		 * System.out.println("UPDATE!"); if(arg1.equals("playing"))
+		 * mTesUpdateTask.run(); if(arg1.equals("requests")) updateQueue();
+		 */
 
 	}
 
