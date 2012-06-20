@@ -287,7 +287,7 @@ public abstract class MarietjeMessenger extends Observable {
 		}
 		synchronized(outSemaphore) {
 			if(outSemaphore.availablePermits() <0){
-				outSemaphore.release(-outSemaphore.availablePermits())
+				outSemaphore.release(-outSemaphore.availablePermits());
 			}
 		}
 	}
