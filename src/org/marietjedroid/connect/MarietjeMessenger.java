@@ -375,7 +375,7 @@ public abstract class MarietjeMessenger extends Observable {
 		try {
 			token = d.getString(0);
 			msgs = d.getJSONArray(1);
-			JSONObject stream = d.getJSONObject(2);
+			JSONArray stream = d.getJSONArray(2);
 		} catch (JSONException e) {
 			throw (exception=new MarietjeException("unexpected format of response list"));
 		}

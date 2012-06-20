@@ -45,20 +45,17 @@ public class RequestListener implements TextWatcher, OnItemClickListener {
 		actv.setOnItemClickListener(this);		
 	}
 
-	@Override
 	public void afterTextChanged(Editable s) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		String text = s.toString();
 		Log.i("ACTV Text", text);
@@ -75,7 +72,6 @@ public class RequestListener implements TextWatcher, OnItemClickListener {
 
 	}
 
-	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		String reqId = (String) hm.get(((TextView)arg0.getChildAt(arg2)).getText().toString());
 		
