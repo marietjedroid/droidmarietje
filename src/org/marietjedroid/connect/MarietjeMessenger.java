@@ -84,6 +84,8 @@ public abstract class MarietjeMessenger extends Observable {
 	private final String path;
 	private final int port;
 
+	private MarietjeException exception;
+
 	public MarietjeMessenger(String host, int port, String path, String token) {
 		this(host, port, path);
 		this.token = token;
@@ -202,7 +204,6 @@ public abstract class MarietjeMessenger extends Observable {
 						messagesInSemaphore.release();
 						handleMessage(token, data);
 					} catch (JSONException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -278,8 +279,7 @@ public abstract class MarietjeMessenger extends Observable {
 			try {
 				doRequest(null);
 			} catch (MarietjeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				stop();
 			}
 		}
 		synchronized (nPending){
@@ -359,7 +359,7 @@ public abstract class MarietjeMessenger extends Observable {
 		} catch (IOException e) {
 			MarietjeException tr = new MarietjeException("Connection stuk!"
 					+ e.getMessage());
-			System.out.println("KAPOT");
+			this.exception = tr;
 			throw tr;
 		}
 
@@ -367,11 +367,11 @@ public abstract class MarietjeMessenger extends Observable {
 		try {
 			d = new JSONArray(new JSONTokener(sb.toString()));
 		} catch (JSONException e) {
-			throw new MarietjeException("Ja, kapot!");
+			throw (exception=new MarietjeException("Ja, JSON kapot!"));
 		}
 
 		if (d == null || d.length() != 3)
-			throw new MarietjeException("Unexpected length of response list");
+			throw (exception=new MarietjeException("Unexpected length of response list"));
 		String token = null;
 		JSONArray msgs = null;
 		try {
@@ -379,7 +379,7 @@ public abstract class MarietjeMessenger extends Observable {
 			msgs = d.getJSONArray(1);
 			JSONObject stream = d.getJSONObject(2);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
+			throw (exception=new MarietjeException("unexpected format of response list"));
 		}
 
 		synchronized (this.outSemaphore) {
@@ -402,7 +402,7 @@ public abstract class MarietjeMessenger extends Observable {
 				this.queueMessageIn.add(msgs.getJSONObject(i));
 				this.messageInSemaphore.release();
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
+				System.err.println("ontvangen json kapot");
 				e.printStackTrace();
 			} finally {
 				messagesInSemaphore.release();
@@ -447,10 +447,24 @@ public abstract class MarietjeMessenger extends Observable {
 	public void stop() {
 		System.out.println("Stopping");
 		
-		 this.running = false;
-		 this.messageInSemaphore.notifyAll();
-		 this.outSemaphore.notifyAll();
+		this.running = false;
+		this.messageInSemaphore.release();
+		this.outSemaphore.release();		
 		 
 	}
+	
+	
+	
+	public boolean isRunning() {
+		return running;
+	}
+
+	/**
+	 * @return the exception
+	 */
+	public MarietjeException getException() {
+		return exception;
+	}
+
 
 }

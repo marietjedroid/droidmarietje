@@ -18,8 +18,6 @@ package org.marietjedroid.connect;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.concurrent.Semaphore;
 
 import org.json.JSONArray;

@@ -55,7 +55,7 @@ public class MarietjeClient extends Observable implements Observer {
 	
 	private String accessKey = null;
 	
-	int queryToken = 0;
+	Integer queryToken = 0;
 	
 	private boolean followingPlaying = false;
 	
@@ -106,6 +106,9 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @throws MarietjeException 
 	 */
 	public MarietjeTrack[] getQueue() throws MarietjeException {
+		if(channel.getException() != null) 
+			throw channel.getException();
+		
 		ArrayList<MarietjeRequest> queue = new ArrayList<MarietjeRequest>();
 
 		try {
@@ -141,6 +144,8 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @throws MarietjeException
 	 */
 	public void followQueue() throws MarietjeException {
+		if(channel.getException() != null) 
+			throw channel.getException();
 		
 		try{
 			this.channel.sendMessage("{'type':'follow','which':['requests']}");
@@ -156,6 +161,9 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @throws MarietjeException
 	 */
 	public void unfollowQueue() throws MarietjeException {
+		if(channel.getException() != null) 
+			throw channel.getException();
+		
 		this.followingQueue = false;
 		try {
 			this.channel.sendMessage(new JSONObject("{'type':'unfollow','which':['requests']}"));
@@ -173,6 +181,9 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @throws MarietjeException 
 	 */
 	public MarietjePlaying getPlaying() throws MarietjeException {
+		if(channel.getException() != null) 
+			throw channel.getException();
+		
 		MarietjePlaying nowPlaying = null;
 		try {
 			if(!followingPlaying || this.channel.getNowPlaying() == null) {
@@ -201,6 +212,9 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @throws MarietjeException
 	 */
 	public void followPlaying() throws MarietjeException {
+		if(channel.getException() != null) 
+			throw channel.getException();
+		
 		try {
 			this.channel.sendMessage("{'type':'follow','which':['playing']}");
 			this.followingPlaying = true;
@@ -217,6 +231,8 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @throws MarietjeException 
 	 */
 	public void unfollowNowPlaying() throws MarietjeException {
+		if(channel.getException() != null) 
+			throw channel.getException();
 		try {
 			this.channel.sendMessage("{'type':'unfollow','which':'['playing']}");
 			this.followingPlaying = false;
@@ -233,6 +249,9 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @throws MarietjeException
 	 */
 	public synchronized void login (String username, String password) throws MarietjeException {
+		if(channel.getException() != null) 
+			throw channel.getException();
+		
 		try {
 			this.channel.sendMessage("{'type':'request_login_token'}");
 			try {
@@ -281,6 +300,9 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @throws MarietjeException
 	 */
 	public void requestTrack (String trackid) throws MarietjeException {
+		if(channel.getException() != null) 
+			throw channel.getException();
+		
 		if(this.accessKey == null)
 			throw new MarietjeException("You must log in");
 		try {
@@ -309,8 +331,12 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @param artist
 	 * @param title
 	 * @param f
+	 * @throws MarietjeException 
 	 */
-	public void uploadTrack(String artist, String title, FileInputStream f) {
+	public void uploadTrack(String artist, String title, FileInputStream f) throws MarietjeException {
+		if(channel.getException() != null) 
+			throw channel.getException();
+		
 	}
 	
 	/**
@@ -334,7 +360,12 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @throws MarietjeException 
 	 */
 	public MarietjeTrack[] search(String query, int skip, int count) throws MarietjeException {
-		this.queryToken++;
+		if(channel.getException() != null) 
+			throw channel.getException();
+		synchronized(queryToken){
+		 	this.queryToken++;
+		}
+		
 		try {
 			this.channel.sendPriorityMessage("{'type':'query_media', 'token':"+queryToken+
 					",'skip':"+skip+",'count':"+count+",'query':'"+query+"'}");
