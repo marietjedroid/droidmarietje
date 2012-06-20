@@ -70,7 +70,7 @@ class MarietjeClientChannel extends MarietjeMessenger{
 	/**
 	 * Access Key
 	 */
-	private String accessKey;
+	private String accessKey = "";
 
 	/**
 	 * Easy access to the semaphore of MarietjeClient
@@ -115,6 +115,8 @@ class MarietjeClientChannel extends MarietjeMessenger{
 	 */
 	public void handleMessage(String token, JSONObject data)
 			throws JSONException {
+		
+		System.out.println("processing" + data.toString());
 		if (data.getString("type").equals("media_part")) {
 			synchronized (tracksRetrieved) {
 				JSONObject ding = data.getJSONObject("part");
@@ -199,7 +201,7 @@ class MarietjeClientChannel extends MarietjeMessenger{
 	JSONArray getRequests() {
 		return this.requests;
 	}
-
+	
 	/**
 	 * @return the nowPlaying
 	 */
@@ -262,7 +264,6 @@ class MarietjeClientChannel extends MarietjeMessenger{
 	 */
 	public void sendPriorityMessage(String json) throws JSONException {
 		this.sendPriorityMessage(new JSONObject( json));
-		
 	}
 
 

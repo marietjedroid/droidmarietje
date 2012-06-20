@@ -248,48 +248,48 @@ public class MarietjeClient extends Observable implements Observer {
 	 */
 	public void login(String username, String password)
 			throws MarietjeException {
-		synchronized (accessKey) {
-			if (channel.getException() != null)
-				throw channel.getException();
 
-			try {
-				this.channel.sendPriorityMessage("{'type':'request_login_token'}");
-				this.loginAttempt.acquire();
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (channel.getException() != null)
+			throw channel.getException();
 
-			String token = this.channel.getLoginToken();
-			String hash = token.concat(password);
-			MessageDigest md5 = null;
-			try {
-				md5 = MessageDigest.getInstance("MD5");
-			} catch (NoSuchAlgorithmException e) {
-				throw new MarietjeException("Problem with MD5 Message digest");
-			}
-			hash = md5.digest(hash.getBytes()).toString();
-			try {
-				this.channel.sendPriorityMessage("{'type':'login', 'username':'"
-						+ username + "'," + "'hash':'" + hash + "'}");
-			} catch (JSONException e) {
-				throw new MarietjeException("Problem with the JSON feed");
-			}
-			try {
-				this.loginAttempt.acquire();
-				if (this.channel.getLoginError() != null) {
-					throw this.channel.getLoginError();
-				}
-				this.accessKey = this.channel.getAccessKey();
-
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			this.channel.sendPriorityMessage("{'type':'request_login_token'}");
+			this.loginAttempt.acquire();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
+		String token = this.channel.getLoginToken();
+		String hash = token.concat(password);
+		MessageDigest md5 = null;
+		try {
+			md5 = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			throw new MarietjeException("Problem with MD5 Message digest");
+		}
+		hash = md5.digest(hash.getBytes()).toString();
+		try {
+			this.channel.sendPriorityMessage("{'type':'login', 'username':'"
+					+ username + "'," + "'hash':'" + hash + "'}");
+		} catch (JSONException e) {
+			throw new MarietjeException("Problem with the JSON feed");
+		}
+		try {
+			this.loginAttempt.acquire();
+			if (this.channel.getLoginError() != null) {
+				throw this.channel.getLoginError();
+			}
+			this.accessKey = this.channel.getAccessKey();
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	/**

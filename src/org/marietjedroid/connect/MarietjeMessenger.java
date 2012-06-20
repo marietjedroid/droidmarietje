@@ -49,7 +49,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-
 /**
  * Handles most of the messaging aspect
  * 
@@ -73,9 +72,9 @@ public abstract class MarietjeMessenger extends Observable {
 	private Queue<JSONObject> queueMessageIn = new LinkedList<JSONObject>();
 
 	private Queue<JSONObject> queueOut = new LinkedList<JSONObject>();
-	
+
 	private Semaphore messagesInSemaphore = new Semaphore(1);
-	
+
 	private Integer nPending = 0;
 
 	private final String host;
@@ -188,24 +187,23 @@ public abstract class MarietjeMessenger extends Observable {
 	private class MessageDispatcher implements Runnable {
 
 		public void run() {
-			try {
-				messagesInSemaphore.acquire();
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			while (running) {
-				while (!queueMessageIn.isEmpty()) {
-					try {
 
-						JSONObject data = queueMessageIn.poll();
-						messagesInSemaphore.release();
-						handleMessage(token, data);
-					} catch (JSONException e) {
-						e.printStackTrace();
+			while (running) {
+				ArrayList<JSONObject> msgs;
+				synchronized (queueMessageIn) {
+					msgs = new ArrayList<JSONObject>(queueMessageIn);
+					queueMessageIn.clear();
+				}
+				
+				for(JSONObject msg : msgs) {
+					try {
+						handleMessage(token,msg);
+					} catch (JSONException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 				}
-			
+				
 				try {
 					messageInSemaphore.acquire();
 				} catch (InterruptedException e) {
@@ -213,6 +211,7 @@ public abstract class MarietjeMessenger extends Observable {
 					e.printStackTrace();
 				}
 			}
+
 		}
 	}
 
@@ -237,19 +236,18 @@ public abstract class MarietjeMessenger extends Observable {
 
 		}
 	}
-	
+
 	private void sendMessages() {
 		JSONObject[] data = null;
-		
-		//do we need to execute the wait code?
+
+		// do we need to execute the wait code?
 		// needed for the synchronized.
 		Boolean wait = false;
-		synchronized(nPending) {
-			if ((queueOut.isEmpty() || token == null) && nPending > 0) 
+		synchronized (nPending) {
+			if ((queueOut.isEmpty() || token == null) && nPending > 0)
 				wait = true;
 		}
-		if(wait)	
-		{
+		if (wait) {
 			try {
 				outSemaphore.acquire();
 			} catch (InterruptedException e) {
@@ -258,10 +256,10 @@ public abstract class MarietjeMessenger extends Observable {
 				return;
 			sendMessages();
 		}
-		synchronized (nPending){
+		synchronized (nPending) {
 			nPending++;
 		}
-		synchronized(queueOut){
+		synchronized (queueOut) {
 			if (!queueOut.isEmpty()) {
 				data = queueOut.toArray(new JSONObject[0]);
 				queueOut.clear();
@@ -280,11 +278,12 @@ public abstract class MarietjeMessenger extends Observable {
 				stop();
 			}
 		}
-		synchronized (nPending){
+		synchronized (nPending) {
 			nPending--;
 		}
-		synchronized(outSemaphore) {
-			if(outSemaphore.availablePermits() <0){
+		synchronized (outSemaphore) {
+			if (outSemaphore.availablePermits() < 0) {
+				System.out.println("permits fixen!");
 				outSemaphore.release(-outSemaphore.availablePermits());
 			}
 		}
@@ -365,19 +364,21 @@ public abstract class MarietjeMessenger extends Observable {
 		try {
 			d = new JSONArray(new JSONTokener(sb.toString()));
 		} catch (JSONException e) {
-			throw (exception=new MarietjeException("Ja, JSON kapot!"));
+			throw (exception = new MarietjeException("Ja, JSON kapot!"));
 		}
 
 		if (d == null || d.length() != 3)
-			throw (exception=new MarietjeException("Unexpected length of response list"));
+			throw (exception = new MarietjeException(
+					"Unexpected length of response list"));
 		String token = null;
 		JSONArray msgs = null;
 		try {
 			token = d.getString(0);
 			msgs = d.getJSONArray(1);
-			JSONArray stream = d.getJSONArray(2);
+			// JSONArray stream = d.getJSONArray(2);
 		} catch (JSONException e) {
-			throw (exception=new MarietjeException("unexpected format of response list"));
+			throw (exception = new MarietjeException(
+					"unexpected format of response list"));
 		}
 
 		synchronized (this.outSemaphore) {
@@ -388,29 +389,24 @@ public abstract class MarietjeMessenger extends Observable {
 				this.outSemaphore.release();
 			}
 		}
-		
-		try {
-			messagesInSemaphore.acquire();
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
 		for (int i = 0; i < msgs.length(); i++) {
 			try {
-				this.queueMessageIn.add(msgs.getJSONObject(i));
+				System.out.println("adding msg to queue");
+				synchronized (queueMessageIn) {
+					this.queueMessageIn.add(msgs.getJSONObject(i));
+				}
 				this.messageInSemaphore.release();
 			} catch (JSONException e) {
 				System.err.println("ontvangen json kapot");
 				e.printStackTrace();
-			} finally {
-				messagesInSemaphore.release();
 			}
 		}
 
 		// TODO Streams left out.
 
 	}
-	
+
 	/**
 	 * Immediately sends the messages.
 	 * 
@@ -419,7 +415,7 @@ public abstract class MarietjeMessenger extends Observable {
 	protected void sendPriorityMessage(JSONObject jsonObject) {
 		this.sendMessage(jsonObject);
 		sendMessages();
-		
+
 	}
 
 	/**
@@ -444,15 +440,13 @@ public abstract class MarietjeMessenger extends Observable {
 	 */
 	public void stop() {
 		System.out.println("Stopping");
-		
+
 		this.running = false;
 		this.messageInSemaphore.release();
-		this.outSemaphore.release();		
-		 
+		this.outSemaphore.release();
+
 	}
-	
-	
-	
+
 	public boolean isRunning() {
 		return running;
 	}
@@ -463,6 +457,5 @@ public abstract class MarietjeMessenger extends Observable {
 	public MarietjeException getException() {
 		return exception;
 	}
-
 
 }
