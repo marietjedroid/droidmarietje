@@ -78,7 +78,7 @@ public abstract class MarietjeMessenger extends Observable {
 	
 	private Semaphore messagesInSemaphore = new Semaphore(1);
 	
-	private int nPending = 0;
+	private Integer nPending = 0;
 
 	private final String host;
 	private final String path;
@@ -199,16 +199,14 @@ public abstract class MarietjeMessenger extends Observable {
 					try {
 
 						JSONObject data = queueMessageIn.poll();
-						System.out.println("passing to handle: " + data
-								+ " queue size: " + queueMessageIn.size());
+						messagesInSemaphore.release();
 						handleMessage(token, data);
-						System.out.println("arg.");
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-			messagesInSemaphore.release();
+			
 				try {
 					messageInSemaphore.acquire();
 				} catch (InterruptedException e) {
@@ -234,40 +232,63 @@ public abstract class MarietjeMessenger extends Observable {
 		 */
 		public void run() {
 			while (running) {
+				sendMessages();
 
-				JSONObject[] data = null;
-				if ((queueOut.isEmpty() || token == null) && nPending > 0) {
-					try {
-						outSemaphore.acquire();
-					} catch (InterruptedException e) {
-					}
-					if (!running)
-						return;
-					continue;
-				}
-				nPending++;
-
-				if (!queueOut.isEmpty()) {
-					data = queueOut.toArray(new JSONObject[0]);
-					queueOut.clear();
-				}
-				if (data != null) {
-					try {
-						doRequest(Arrays.asList(data));
-					} catch (MarietjeException e) {
-						stop();
-					}
-				} else {
-					try {
-						doRequest(null);
-					} catch (MarietjeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				nPending--;
 			}
 
+		}
+	}
+	
+	private void sendMessages() {
+		JSONObject[] data = null;
+		
+		//do we need to execute the wait code?
+		// needed for the synchronized.
+		Boolean wait = false;
+		synchronized(nPending) {
+			if ((queueOut.isEmpty() || token == null) && nPending > 0) 
+				wait = true;
+		}
+		if(wait)	
+		{
+			try {
+				outSemaphore.acquire();
+			} catch (InterruptedException e) {
+			}
+			if (!running)
+				return;
+			sendMessages();
+		}
+		synchronized (nPending){
+			nPending++;
+		}
+		synchronized(queueOut){
+			if (!queueOut.isEmpty()) {
+				data = queueOut.toArray(new JSONObject[0]);
+				queueOut.clear();
+			}
+		}
+		if (data != null) {
+			try {
+				doRequest(Arrays.asList(data));
+			} catch (MarietjeException e) {
+				stop();
+			}
+		} else {
+			try {
+				doRequest(null);
+			} catch (MarietjeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		synchronized (nPending){
+			nPending--;
+		}
+		synchronized(outSemaphore) {
+			if(outSemaphore.availablePermits() <0){
+				outSemaphore.release(-outSemaphore.availablePermits())
+			}
 		}
 	}
 
@@ -390,6 +411,17 @@ public abstract class MarietjeMessenger extends Observable {
 
 		// TODO Streams left out.
 
+	}
+	
+	/**
+	 * Immediately sends the messages.
+	 * 
+	 * @param jsonObject
+	 */
+	protected void sendPriorityMessage(JSONObject jsonObject) {
+		this.sendMessage(jsonObject);
+		sendMessages();
+		
 	}
 
 	/**

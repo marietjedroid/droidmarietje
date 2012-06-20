@@ -253,5 +253,18 @@ class MarietjeClientChannel extends MarietjeMessenger{
 		
 	}
 
+	/**
+	 * @param json
+	 * @throws JSONException 
+	 */
+	public void sendPriorityMessage(String json) throws JSONException {
+		this.sendPriorityMessage(new JSONObject( json));
+		
+	}
+
+
+
+	
+
 
 }

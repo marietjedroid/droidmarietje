@@ -336,7 +336,7 @@ public class MarietjeClient extends Observable implements Observer {
 	public MarietjeTrack[] search(String query, int skip, int count) throws MarietjeException {
 		this.queryToken++;
 		try {
-			this.channel.sendMessage("{'type':'query_media', 'token':"+queryToken+
+			this.channel.sendPriorityMessage("{'type':'query_media', 'token':"+queryToken+
 					",'skip':"+skip+",'count':"+count+",'query':'"+query+"'}");
 			this.queryResults.acquire();
 			return this.channel.getQueryResults();
