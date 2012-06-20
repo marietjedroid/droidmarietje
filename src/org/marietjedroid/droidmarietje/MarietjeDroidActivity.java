@@ -30,16 +30,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MarietjeDroidActivity extends Activity implements OnClickListener,
-		Observer {
+public class MarietjeDroidActivity extends Activity implements OnClickListener {
 
 	private static MarietjeClient mc = null;
 	private static MarietjeTrack[] playlist = null;
 	MarietjePlaying currentlyPlaying;
-
-	private static final String[] SONGS = new String[] {
-			"Nothing Else Matters", "One", "Enter Sandman", "Fade to Black",
-			"Fuel" };
 
 	private AutoCompleteTextView requesttxt = null;
 	private TextView txtCurrentlyPlaying = null;
@@ -65,7 +60,6 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 
 		try {
 			mc = new MarietjeClient("192.168.56.101", 8080, "");
-			mc.addObserver(this);
 		} catch (MarietjeException e) {
 
 			Toast t = Toast.makeText(this.getApplicationContext(),
@@ -234,21 +228,6 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 			System.exit(0);
 		}
 		
-	}
-
-	public void update(Observable arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		// TODO Updaten van ding wat binnenkomt
-		// Wat vooral belangrijk is, is dat hij het binnenkomende type
-		// doorstuurt naar hier als arg1
-		// zie handleMessage(String msg) in MarietjeClientChannel.java voor de
-		// types.
-		/*
-		 * Log.d("update", "update " + arg1.toString());
-		 * System.out.println("UPDATE!"); if(arg1.equals("playing"))
-		 * mTesUpdateTask.run(); if(arg1.equals("requests")) updateQueue();
-		 */
-
 	}
 
 }
