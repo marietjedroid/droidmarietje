@@ -14,6 +14,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -55,6 +57,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		
 		txtCurrentlyPlaying = (TextView) findViewById(R.id.currentlyplaying);
 
 		durationlist = new ArrayList<TextView>();
@@ -76,7 +79,8 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_dropdown_item_1line, SONGS);
 		requesttxt = (AutoCompleteTextView) findViewById(R.id.requesttext);
-		requesttxt.setAdapter(adapter);
+		// requesttxt.setAdapter(adapter);
+		requesttxt.addTextChangedListener(new RequestListener(mc, requesttxt, this.getApplicationContext()));
 
 		((Button) findViewById(R.id.requestbutton)).setOnClickListener(this);
 		findViewById(R.id.currentlyplayingwrap).requestFocus();

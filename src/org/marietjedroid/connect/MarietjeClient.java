@@ -337,7 +337,7 @@ public class MarietjeClient extends Observable implements Observer {
 		this.queryToken++;
 		try {
 			this.channel.sendMessage("{'type':'query_media', 'token':"+queryToken+
-					"'skip':"+skip+",'count':"+count+"'query':'"+query+"'}");
+					",'skip':"+skip+",'count':"+count+",'query':'"+query+"'}");
 			this.queryResults.acquire();
 			return this.channel.getQueryResults();
 		} catch (JSONException e) {
