@@ -160,6 +160,11 @@ class MarietjeClientChannel extends MarietjeMessenger{
 						data.getString("message"));
 				this.loginAttempt.release();
 			}
+		} else if (data.getString("type").equals("login_token")) {
+			synchronized(this.loginToken) {
+				this.loginToken = data.getString("login_token");
+				this.loginAttempt.release();
+			}
 		} else if (data.getString("type").equals("logged_in")) {
 			synchronized (loginAttempt) {
 				this.accessKey = data.getString("accessKey");
