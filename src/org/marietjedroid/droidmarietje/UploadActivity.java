@@ -1,5 +1,11 @@
 package org.marietjedroid.droidmarietje;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import org.marietjedroid.connect.MarietjeClient;
+import org.marietjedroid.connect.MarietjeException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,6 +20,10 @@ import android.widget.TextView;
 public class UploadActivity extends Activity implements OnClickListener {
 	private TextView txtFileName = null;
 	private Button btnUpload = null;
+	
+	private String filePath;
+	
+	private MarietjeClient mc = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -21,6 +31,8 @@ public class UploadActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.upload);
 
+		mc = MarietjeDroidActivity.getConnection();
+		
 		txtFileName = (TextView) findViewById(R.id.txtfilename);
 
 		((Button) findViewById(R.id.btnpickfile)).setOnClickListener(this);
@@ -32,15 +44,24 @@ public class UploadActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		int clicked = v.getId();
 
+		Log.i("Click", ((Button)v).getText().toString());
+		
 		if (clicked == R.id.btnpickfile) {
-			Log.d("Click", "Pick File");
 			Intent intent = new Intent();
 			intent.addCategory(Intent.CATEGORY_OPENABLE);
 			intent.setType("text/csv");
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			startActivityForResult(Intent.createChooser(intent, "Select media file"), 1);
-		} else if (clicked == R.id.btnupload) {
-			Log.d("Click", "Upload");
+		} else if (clicked == R.id.btnupload) {	
+			
+			try {
+				FileInputStream fis = new FileInputStream(filePath);
+				mc.uploadTrack("Skrillex", "Sc", fis);
+			} catch (FileNotFoundException e) {
+				Log.e("File not found", e.getMessage());
+			} catch (MarietjeException e) {
+				Log.e("Upload", e.getMessage());
+			}
 		}
 	}
 
@@ -51,7 +72,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 
 		Uri selectedFile = data.getData();
 
-		String filePath = selectedFile.getLastPathSegment();
+		filePath = selectedFile.getLastPathSegment();
 		txtFileName.setText("Are you sure you want to upload " + filePath + "?");
 
 		btnUpload.setVisibility(View.VISIBLE);

@@ -29,7 +29,7 @@ public class RequestListener implements TextWatcher, OnItemClickListener {
 	private Context c;
 	private ArrayAdapter<String> aa;
 
-	private HashMap hm = new HashMap<String, String>();
+	private HashMap<String, String> hm = new HashMap<String, String>();
 	private String reqId = null;
 	
 	public RequestListener(MarietjeClient mc, AutoCompleteTextView actv,
