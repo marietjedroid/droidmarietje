@@ -50,7 +50,7 @@ class MarietjeClientChannel extends MarietjeMessenger{
 	/**
 	 * login token
 	 */
-	private String loginToken;
+	private String loginToken = "";
 
 	/**
 	 * login error
