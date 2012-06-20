@@ -61,7 +61,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		try {
 			mc = new MarietjeClient("192.168.56.101", 8080, "");
 		} catch (MarietjeException e) {
-
+			Log.e("Err", e.getMessage());
 			Toast t = Toast.makeText(this.getApplicationContext(),
 					"Kon niet verbinden met marietje", Toast.LENGTH_LONG);
 			t.show();
@@ -87,6 +87,9 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 	}
 
 	private void updateQueue() {
+		if (mc == null){
+			return;
+		}
 		try {
 			playlist = mc.getQueue();
 
@@ -200,6 +203,10 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		String artist = "";
 		String title = "";
 
+		if (mc == null) {
+			return;
+		}
+		
 		try {
 			MarietjePlaying mp = mc.getPlaying();
 			if (mp == currentlyPlaying)
