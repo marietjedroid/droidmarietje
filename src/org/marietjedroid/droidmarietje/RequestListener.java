@@ -4,6 +4,7 @@ import org.marietjedroid.connect.MarietjeClient;
 import org.marietjedroid.connect.MarietjeException;
 import org.marietjedroid.connect.MarietjeTrack;
 
+import android.R.anim;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -28,9 +29,9 @@ public class RequestListener implements TextWatcher {
 		this.mc = mc;
 		this.actv = actv;
 		this.c = c;
+		
+		aa = new ArrayAdapter<String>(c, android.R.layout.simple_dropdown_item_1line);
 
-		int length = 10;
-		aa = new ArrayAdapter<String>(c, length);
 		actv.setAdapter(aa);
 		
 	}
@@ -53,13 +54,22 @@ public class RequestListener implements TextWatcher {
 		String text = s.toString();
 		Log.i("ACTV Text", text);
 
+		
+		
 		if (text.equals(prevText)) {
 			// niet zoeken, is al gezocht
 			Log.i("Text", "Al gezocht naar " + text);
 			return;
 		} else {
-			prevText = text;
-			new RequestResult(mc, c, actv, aa).execute(text);
+			if (text.equals("")){
+				Log.i("nope", "nope nope nope");
+				return;
+			}
+				 
+			if(text.length() == 1){
+				prevText = text;
+				new RequestResult(mc, c, actv, aa).execute(text);
+			}
 		}
 
 	}
@@ -73,6 +83,8 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 	private AutoCompleteTextView actv;
 
 	private ArrayAdapter<String> aa = null;
+	
+	private String[] s;
 
 	public RequestResult(MarietjeClient mc, Context c, AutoCompleteTextView actv, ArrayAdapter<String> aa) {
 		this.mc = mc;
@@ -89,17 +101,19 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 
 			int length = mtArr.length;
 			Log.i("Length", "" + length);
-
-			aa.add("Kalin");
-			aa.add("Kaas");
 			
+			s = new String[length];
+			
+			int i = 0;
 			for (MarietjeTrack mt : mtArr) {
-				// aa.add(mt.getTitle());
+				aa.add(mt.getTitle());
+				s[i] = mt.getTitle();
+				i++;
 				Log.i("Track", mt.getTitle());
 			}
 
 			publishProgress(100);
-		} catch (MarietjeException e) {
+		} catch (Exception e) {
 			Log.e("onTextChanged", e.getMessage());
 		}
 		return null;
@@ -107,9 +121,11 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 
 	protected void onProgressUpdate(Integer... progress) {
 		Log.i("Progress", "Klaar met zoeken mafaka");
-
 		
-		aa.notifyDataSetChanged();
-
+		ArrayAdapter<String> fiets = new ArrayAdapter<String>(c, android.R.layout.simple_dropdown_item_1line, s);
+		fiets.setNotifyOnChange(true);
+		actv.setAdapter(fiets);
+		
+		actv.showDropDown();
 	}
 }
