@@ -4,6 +4,7 @@ import org.marietjedroid.connect.MarietjeClient;
 import org.marietjedroid.connect.MarietjeException;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -37,12 +38,34 @@ public class LoginActivity extends Activity implements OnClickListener {
 			// not all fields have been filled out
 			return;
 		}
+		
+		AsyncTask<String, Integer, String> asyncTask = new LoginTask(mc);
+		
+		asyncTask.execute(new String[] {username, password});
+		
+		
+		
+	}
+}
 
+class LoginTask extends AsyncTask<String, Integer, String>{
+
+	private MarietjeClient mc;
+
+	public LoginTask(MarietjeClient mc){
+		this.mc = mc;
+	}
+	
+	@Override
+	protected String doInBackground(String... params) {
+		Log.i("Inloggen", "Nu mee bezig... " + params[0] + ":" + params[1]);
 		try {
-			mc.login(username, password); // TODO pas op, locks
+			mc.login(params[0], params[1]); // TODO pas op, locks
 			Log.i("Login", "Success");
 		} catch (MarietjeException me) {
 			Log.e("Login", "Failed");
 		}
+		return null;
 	}
+	
 }

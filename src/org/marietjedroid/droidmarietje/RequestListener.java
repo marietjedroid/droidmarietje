@@ -1,5 +1,7 @@
 package org.marietjedroid.droidmarietje;
 
+import java.util.HashMap;
+
 import org.marietjedroid.connect.MarietjeClient;
 import org.marietjedroid.connect.MarietjeException;
 import org.marietjedroid.connect.MarietjeTrack;
@@ -11,19 +13,25 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class RequestListener implements TextWatcher {
+public class RequestListener implements TextWatcher, OnItemClickListener {
 
 	private AutoCompleteTextView actv = null;
 	private MarietjeClient mc;
 	private Context c;
 	private ArrayAdapter<String> aa;
 
-	private String prevText = "";
-
+	private HashMap hm = new HashMap<String, String>();
+	private String reqId = null;
+	
 	public RequestListener(MarietjeClient mc, AutoCompleteTextView actv,
 			Context c) {
 		this.mc = mc;
@@ -34,6 +42,7 @@ public class RequestListener implements TextWatcher {
 
 		actv.setAdapter(aa);
 		
+		actv.setOnItemClickListener(this);		
 	}
 
 	@Override
@@ -55,23 +64,28 @@ public class RequestListener implements TextWatcher {
 		Log.i("ACTV Text", text);
 
 		
-		
-		if (text.equals(prevText)) {
-			// niet zoeken, is al gezocht
-			Log.i("Text", "Al gezocht naar " + text);
+		if (text.equals("")){
+			Log.i("TextEmpty", "true");
 			return;
-		} else {
-			if (text.equals("")){
-				Log.i("nope", "nope nope nope");
-				return;
-			}
-				 
-			if(text.length() == 1){
-				prevText = text;
-				new RequestResult(mc, c, actv, aa).execute(text);
-			}
+		}
+			 
+		if(text.length() == 1){
+			new RequestResult(mc, c, actv, aa, hm, reqId).execute(text.toLowerCase());
 		}
 
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+		String reqId = (String) hm.get(((TextView)arg0.getChildAt(arg2)).getText().toString());
+		
+		Log.i("reqId", reqId);
+		
+		this.reqId = reqId;
+	}
+	
+	public String getReqId(){
+		return this.reqId;
 	}
 
 }
@@ -84,13 +98,18 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 
 	private ArrayAdapter<String> aa = null;
 	
+	private HashMap<String, String> hm;
+	
 	private String[] s;
+	private String reqId;
 
-	public RequestResult(MarietjeClient mc, Context c, AutoCompleteTextView actv, ArrayAdapter<String> aa) {
+	public RequestResult(MarietjeClient mc, Context c, AutoCompleteTextView actv, ArrayAdapter<String> aa, HashMap<String, String> hm, String reqId) {
 		this.mc = mc;
 		this.c = c;
 		this.actv = actv;
+		this.hm = hm;
 		this.aa = aa;
+		this.reqId = reqId;
 	}
 
 	@Override
@@ -102,11 +121,18 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 			int length = mtArr.length;
 			Log.i("Length", "" + length);
 			
-			s = new String[length];
+			if(length == 0){
+				this.reqId = null;
+			}
 			
+			
+			
+			s = new String[length];
+					
 			int i = 0;
 			for (MarietjeTrack mt : mtArr) {
 				aa.add(mt.getTitle());
+				hm.put(mt.getTitle(), mt.getTrackKey());
 				s[i] = mt.getTitle();
 				i++;
 				Log.i("Track", mt.getTitle());

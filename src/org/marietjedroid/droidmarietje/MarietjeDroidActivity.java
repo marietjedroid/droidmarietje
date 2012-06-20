@@ -46,6 +46,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 
 	private Handler mHandler = new Handler();
 	private ArrayList<TextView> durationlist;
+	private RequestListener tc;
 
 	public static MarietjeClient getConnection() {
 		return mc;
@@ -76,11 +77,10 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 
 		updateQueue();
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_dropdown_item_1line, SONGS);
 		requesttxt = (AutoCompleteTextView) findViewById(R.id.requesttext);
-		// requesttxt.setAdapter(adapter);
-		requesttxt.addTextChangedListener(new RequestListener(mc, requesttxt, this.getApplicationContext()));
+		RequestListener tc = new RequestListener(mc, requesttxt, this.getApplicationContext());
+		requesttxt.addTextChangedListener(tc);
+		this.tc = tc;
 
 		((Button) findViewById(R.id.requestbutton)).setOnClickListener(this);
 		findViewById(R.id.currentlyplayingwrap).requestFocus();
@@ -226,6 +226,14 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener,
 
 	public void onClick(View v) {
 		Log.d("Request", requesttxt.getText().toString());
+		try {
+			mc.requestTrack(tc.getReqId());
+		} catch (MarietjeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(0);
+		}
+		
 	}
 
 	public void update(Observable arg0, Object arg1) {
