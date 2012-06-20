@@ -4,9 +4,6 @@
 		android:id="@+id/mnulogin"
 		android:title="Login" />
     <item 
-        android:id="@+id/mnurequest"
-        android:title="Request" />
-    <item 
         android:id="@+id/mnuupload"
         android:title="Upload" />
 </menu>

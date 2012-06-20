@@ -100,7 +100,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		}
 		synchronized (durationlist) {
 			ViewGroup muzieklijst = (ViewGroup) findViewById(R.id.muzieklijstview);
-			SongListener sl = new SongListener();
+			SongListener sl = new SongListener(this.getApplicationContext());
 			durationlist.clear();
 			muzieklijst.removeAllViews();
 			muzieklijst.refreshDrawableState();
@@ -178,11 +178,6 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.mnurequest:
-			startActivity(new Intent(getApplicationContext(),
-					RequestActivity.class));
-
-			return true;
 		case R.id.mnulogin:
 			startActivity(new Intent(getApplicationContext(),
 					LoginActivity.class));
@@ -229,6 +224,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		Log.d("Request", requesttxt.getText().toString());
 		try {
 			mc.requestTrack(tc.getReqId());
+			this.requesttxt.setText("");
 		} catch (MarietjeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

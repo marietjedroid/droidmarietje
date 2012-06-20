@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    
+    <LinearLayout
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:id="@+id/currentlyplayingwrap"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+        	<AutoCompleteTextView 
+        	    android:id="@+id/requesttext"
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:padding="5dip"
+        	    android:hint="Request a song"
+        	    android:completionThreshold="1"
+        	    android:singleLine="true"
+        	    
+        	    />
+        	
+        	<Button android:id="@+id/requestbutton"
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:text="Request"
+        	    android:padding="5dip"
+        	    />
+        </LinearLayout>
+        
+        	<TextView 
+        	    android:text="Currently Playing:"
+        	    android:textStyle="bold"
+        	    android:layout_width="fill_parent"
+        	    android:layout_height="wrap_content"
+        	   />
+        
+		   <TextView android:id="@+id/currentlyplaying"
+		       android:layout_height="wrap_content"
+		       android:layout_width="fill_parent"
+			/>
+        
+        
+	    <View 
+	        android:background="@drawable/border_bottom"
+	        android:layout_width="fill_parent"
+	        android:layout_height="4dip"
+	        
+	        />
+    </LinearLayout>
+
+    <ScrollView 
+        android:id="@+id/muziekLijst"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        >
+   		 
+        
+        
+    </ScrollView>
+        
+
+
+
+</LinearLayout>
