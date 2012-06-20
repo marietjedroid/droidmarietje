@@ -31,9 +31,9 @@ public class LoginActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		MarietjeClient mc = MarietjeDroidActivity.getConnection();
 
-		String username = txtUsername.getText().toString();
-		String password = txtPassword.getText().toString();
-
+		String username = txtUsername.getText().toString().trim();
+		String password = txtPassword.getText().toString().trim();
+	
 		if (username.equals("") || password.equals("")) {
 			// not all fields have been filled out
 			return;

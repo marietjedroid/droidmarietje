@@ -264,14 +264,16 @@ public class MarietjeClient extends Observable implements Observer {
 		}
 
 		String token = this.channel.getLoginToken();
-		String hash = token.concat(password);
+		
 		MessageDigest md5 = null;
 		try {
 			md5 = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
 			throw new MarietjeException("Problem with MD5 Message digest");
 		}
-		hash = md5.digest(hash.getBytes()).toString();
+		String md5pass = new String(org.apache.commons.codec.binary.Hex.encodeHex(md5.digest(password.getBytes())));
+		String hash = new String(org.apache.commons.codec.binary.Hex.encodeHex(md5.digest((md5pass+token).getBytes())));
+		
 		try {
 			this.channel.sendPriorityMessage("{'type':'login', 'username':'"
 					+ username + "'," + "'hash':'" + hash + "'}");
