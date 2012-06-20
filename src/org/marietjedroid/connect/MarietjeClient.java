@@ -53,7 +53,7 @@ public class MarietjeClient extends Observable implements Observer {
 
 	private MarietjeClientChannel channel = null;
 
-	private String accessKey = null;
+	private String accessKey = "";
 
 	Integer queryToken = 0;
 
@@ -302,7 +302,7 @@ public class MarietjeClient extends Observable implements Observer {
 		if (channel.getException() != null)
 			throw channel.getException();
 
-		if (this.accessKey == null)
+		if (this.accessKey.equals(""))
 			throw new MarietjeException("You must log in");
 		try {
 			this.channel.sendMessage("{'type':'request','mediaKey':'" + trackid
