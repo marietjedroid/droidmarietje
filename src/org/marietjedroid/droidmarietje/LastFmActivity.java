@@ -49,7 +49,7 @@ public class LastFmActivity extends Activity {
 		lfp.parse();
 
 		((TextView) findViewById(R.id.title)).setText(lfp.getTitle());
-		((TextView) findViewById(R.id.artist)).setText(lfp.getArtist());
+		((TextView) findViewById(R.id.artist)).setText(lfp.getArtist() + " " + lfp.getLength());
 		((TextView) findViewById(R.id.wiki)).setText(lfp.getWiki());
 
 		((TextView) findViewById(R.id.album_title)).setText(lfp.getAlbum());

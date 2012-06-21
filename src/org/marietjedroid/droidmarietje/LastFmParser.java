@@ -1,5 +1,9 @@
 package org.marietjedroid.droidmarietje;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -65,8 +69,10 @@ public class LastFmParser {
 		return title;
 	}
 
-	public int getLength() {
-		return length;
+	public String getLength() {
+		DateFormat df = new SimpleDateFormat("m:ss");
+		return df.format(new Date(length));
+
 	}
 
 	public String getAlbum() {
@@ -83,10 +89,7 @@ public class LastFmParser {
 
 	private static String getTagValue(String sTag, Element eElement) {
 		NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
-
 		Node nValue = (Node) nlList.item(0);
-
-		Log.d("Node Value:", nValue.getNodeValue() + " ");
 
 		return nValue.getNodeValue();
 	}
