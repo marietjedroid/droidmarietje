@@ -3,13 +3,10 @@ package org.marietjedroid.droidmarietje;
 import java.util.HashMap;
 
 import org.marietjedroid.connect.MarietjeClient;
-import org.marietjedroid.connect.MarietjeException;
 import org.marietjedroid.connect.MarietjeTrack;
 
-import android.R.anim;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -18,9 +15,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class RequestListener implements TextWatcher, OnItemClickListener {
 
@@ -31,18 +26,17 @@ public class RequestListener implements TextWatcher, OnItemClickListener {
 
 	private HashMap<String, String> hm = new HashMap<String, String>();
 	private String reqId = null;
-	
-	public RequestListener(MarietjeClient mc, AutoCompleteTextView actv,
-			Context c) {
+
+	public RequestListener(MarietjeClient mc, AutoCompleteTextView actv, Context c) {
 		this.mc = mc;
 		this.actv = actv;
 		this.c = c;
-		
+
 		aa = new ArrayAdapter<String>(c, android.R.layout.simple_dropdown_item_1line);
 
 		actv.setAdapter(aa);
-		
-		actv.setOnItemClickListener(this);		
+
+		actv.setOnItemClickListener(this);
 	}
 
 	public void afterTextChanged(Editable s) {
@@ -50,8 +44,7 @@ public class RequestListener implements TextWatcher, OnItemClickListener {
 
 	}
 
-	public void beforeTextChanged(CharSequence s, int start, int count,
-			int after) {
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		// TODO Auto-generated method stub
 
 	}
@@ -60,27 +53,26 @@ public class RequestListener implements TextWatcher, OnItemClickListener {
 		String text = s.toString();
 		Log.i("ACTV Text", text);
 
-		
-		if (text.equals("")){
+		if (text.equals("")) {
 			Log.i("TextEmpty", "true");
 			return;
 		}
-			 
-		if(text.length() == 1){
+
+		if (text.length() == 1) {
 			new RequestResult(mc, c, actv, aa, hm, reqId).execute(text.toLowerCase());
 		}
 
 	}
 
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		String reqId = (String) hm.get(((TextView)arg0.getChildAt(arg2)).getText().toString());
-		
+		String reqId = (String) hm.get(((TextView) arg0.getChildAt(arg2)).getText().toString());
+
 		Log.i("reqId", reqId);
-		
+
 		this.reqId = reqId;
 	}
-	
-	public String getReqId(){
+
+	public String getReqId() {
 		return this.reqId;
 	}
 
@@ -93,13 +85,14 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 	private AutoCompleteTextView actv;
 
 	private ArrayAdapter<String> aa = null;
-	
+
 	private HashMap<String, String> hm;
-	
+
 	private String[] s;
 	private String reqId;
 
-	public RequestResult(MarietjeClient mc, Context c, AutoCompleteTextView actv, ArrayAdapter<String> aa, HashMap<String, String> hm, String reqId) {
+	public RequestResult(MarietjeClient mc, Context c, AutoCompleteTextView actv,
+			ArrayAdapter<String> aa, HashMap<String, String> hm, String reqId) {
 		this.mc = mc;
 		this.c = c;
 		this.actv = actv;
@@ -116,15 +109,13 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 
 			int length = mtArr.length;
 			Log.i("Length", "" + length);
-			
-			if(length == 0){
+
+			if (length == 0) {
 				this.reqId = null;
 			}
-			
-			
-			
+
 			s = new String[length];
-					
+
 			int i = 0;
 			for (MarietjeTrack mt : mtArr) {
 				aa.add(mt.getTitle());
@@ -143,11 +134,12 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 
 	protected void onProgressUpdate(Integer... progress) {
 		Log.i("Progress", "Klaar met zoeken mafaka");
-		
-		ArrayAdapter<String> fiets = new ArrayAdapter<String>(c, android.R.layout.simple_dropdown_item_1line, s);
+
+		ArrayAdapter<String> fiets = new ArrayAdapter<String>(c,
+				android.R.layout.simple_dropdown_item_1line, s);
 		fiets.setNotifyOnChange(true);
 		actv.setAdapter(fiets);
-		
+
 		actv.showDropDown();
 	}
 }

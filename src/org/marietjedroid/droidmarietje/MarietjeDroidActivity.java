@@ -52,7 +52,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		durationlist = new ArrayList<TextView>();
 
 		try {
-			mc = new MarietjeClient("192.168.56.101", 8080, "");
+			mc = new MarietjeClient("192.168.1.86", 8080, "");
 		} catch (MarietjeException e) {
 			Log.e("Err", e.getMessage());
 			Toast t = Toast.makeText(this.getApplicationContext(),
@@ -210,14 +210,20 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 
 	public void onClick(View v) {
 		Log.d("Request", requesttxt.getText().toString());
+
+		if (!mc.isLoggedIn()) {
+			Intent li = new Intent(this.getApplicationContext(), LoginActivity.class);
+
+			startActivity(li);
+		}
+
 		try {
 			mc.requestTrack(tc.getReqId());
 			this.requesttxt.setText("");
 		} catch (MarietjeException e) {
-			// niet ingelogd of andere fout
-			Intent li = new Intent(this.getApplicationContext(), LoginActivity.class);
-
-			startActivity(li);
+			// oei
+			Toast.makeText(this.getApplicationContext(), "Whoops! Something went wrong.",
+					Toast.LENGTH_LONG).show();
 		}
 	}
 }
