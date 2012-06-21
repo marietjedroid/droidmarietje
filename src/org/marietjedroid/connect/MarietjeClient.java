@@ -411,5 +411,12 @@ public class MarietjeClient extends Observable implements Observer {
 	public void addObserver(Observer o) {
 		super.addObserver(o);
 	}
+	
+	/**
+	 * @return is logged in?
+	 */
+	public boolean isLoggedIn() {
+		return accessKey.equals("");
+	}
 
 }
