@@ -48,21 +48,39 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" >
             
-            <ImageView 
-                android:id="@+id/albumart"
-                android:layout_width="100dip"
-                android:layout_height="100dip"
-                />
-            
-            <TextView
-                android:id="@+id/album_title"
+            <RelativeLayout
+                android:id="@+id/albumwrap"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/albumart"
-                android:textSize="15dip"
-                android:textStyle="bold"
-                android:layout_marginLeft="5dip" />
+                >
+	            <ImageView 
+	                android:id="@+id/albumart"
+	                android:layout_width="100dip"
+	                android:layout_height="100dip"
+	                />
+	            		
+	            <TextView
+	                android:id="@+id/album_title"
+	                android:layout_width="fill_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_toRightOf="@id/albumart"
+	                android:textSize="15dip"
+	                android:textStyle="bold"
+	                android:layout_marginLeft="5dip" />
+            </RelativeLayout>
             
+            <RelativeLayout 
+                android:layout_below="@id/albumwrap"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                >
+	            <TextView
+                	android:id="@+id/wiki"
+                	android:layout_width="fill_parent"
+                	android:layout_height="wrap_content"
+                	/>
+	            
+            </RelativeLayout>
         </RelativeLayout>
    		 
     </ScrollView>

@@ -18,6 +18,8 @@ public class LastFmParser {
 	private String album;
 	private String albumArt;
 
+	private String wiki;
+
 	private int length;
 
 	public LastFmParser(String location) {
@@ -49,6 +51,8 @@ public class LastFmParser {
 			this.album = getTagValue("title", albumTag);
 			this.albumArt = getTagValue("image", albumTag);
 
+			Element wikiTag = (Element) (eElement.getElementsByTagName("wiki")).item(0);
+			this.wiki = getTagValue("content", wikiTag);
 		} catch (Exception e) {
 		}
 	}
@@ -71,6 +75,10 @@ public class LastFmParser {
 
 	public String getAlbumArt() {
 		return albumArt;
+	}
+
+	public String getWiki() {
+		return android.text.Html.fromHtml(wiki).toString();
 	}
 
 	private static String getTagValue(String sTag, Element eElement) {
