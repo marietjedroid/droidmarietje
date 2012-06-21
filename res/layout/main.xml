@@ -12,29 +12,32 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
         
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            >
-        	<AutoCompleteTextView 
+            >
+        	<AutoCompleteTextView
         	    android:id="@+id/requesttext"
         	    android:layout_width="wrap_content"
         	    android:layout_height="wrap_content"
-        	    android:padding="5dip"
-        	    android:hint="Request a song"
+        	    android:layout_alignParentLeft="true"
+        	    android:layout_toLeftOf="@+id/requestbutton"
         	    android:completionThreshold="1"
-        	    android:singleLine="true"
-        	    
-        	    />
-        	
-        	<Button android:id="@+id/requestbutton"
-        	    android:layout_width="wrap_content"
-        	    android:layout_height="wrap_content"
-        	    android:text="Request"
+        	    android:hint="Request a song"
         	    android:padding="5dip"
-        	    />
-        </LinearLayout>
+        	    android:singleLine="true" />
+
+        	<Button
+        	    android:id="@+id/requestbutton"
+        	    android:layout_width="70dip"
+        	    android:layout_height="wrap_content"
+        	    android:layout_alignParentRight="true"
+        	    android:layout_alignParentTop="true"
+        	    android:padding="5dip"
+        	    android:text="Request" />
+
+        </RelativeLayout>
         
         	<TextView 
         	    android:text="Currently Playing:"
@@ -84,11 +87,5 @@
 	       -->
         
         </LinearLayout>
-        
-        
     </ScrollView>
-        
-
-
-
 </LinearLayout>
