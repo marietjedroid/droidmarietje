@@ -84,7 +84,11 @@ public class LastFmParser {
 	}
 
 	public String getWiki() {
-		return android.text.Html.fromHtml(wiki).toString();
+		if (wiki == null) {
+			return "";
+		} else {
+			return android.text.Html.fromHtml(wiki).toString();
+		}
 	}
 
 	private static String getTagValue(String sTag, Element eElement) {

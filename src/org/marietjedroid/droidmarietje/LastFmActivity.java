@@ -29,13 +29,13 @@ public class LastFmActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.songinfo);
 
-		// Bundle b = getIntent().getExtras();
+		Bundle b = getIntent().getExtras();
 
-		// String artist = b.getString("artist");
-		// String title = b.getString("title");
+		String artist = b.getString("artist");
+		String title = b.getString("title");
 
-		String artist = "Skrillex";
-		String title = "Scary monsters and nice sprites";
+		// String artist = "Skrillex";
+		// String title = "Scary monsters and nice sprites";
 
 		String artistUrl = URLEncoder.encode(artist);
 		String songUrl = URLEncoder.encode(title);

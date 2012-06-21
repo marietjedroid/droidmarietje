@@ -52,7 +52,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		durationlist = new ArrayList<TextView>();
 
 		try {
-			mc = new MarietjeClient("192.168.56.101", 8080, "");
+			mc = new MarietjeClient("192.168.1.86", 8080, "");
 		} catch (MarietjeException e) {
 			Log.e("Err", e.getMessage());
 			Toast t = Toast.makeText(this.getApplicationContext(),
