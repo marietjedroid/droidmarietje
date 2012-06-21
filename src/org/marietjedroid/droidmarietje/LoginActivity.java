@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class LoginActivity extends Activity implements OnClickListener {
 
@@ -39,7 +40,10 @@ public class LoginActivity extends Activity implements OnClickListener {
 			return;
 		}
 
-		AsyncTask<String, Integer, String> asyncTask = new LoginTask(mc);
+		Toast t = Toast.makeText(this.getApplicationContext(),
+				"Fout met inloggen", Toast.LENGTH_LONG);
+		AsyncTask<String, Integer, String> asyncTask = new LoginTask(mc, t,
+				this);
 
 		asyncTask.execute(new String[] { username, password });
 
@@ -49,9 +53,13 @@ public class LoginActivity extends Activity implements OnClickListener {
 class LoginTask extends AsyncTask<String, Integer, String> {
 
 	private MarietjeClient mc;
+	private Toast toast;
+	private Activity activity;
 
-	public LoginTask(MarietjeClient mc) {
+	public LoginTask(MarietjeClient mc, Toast t, Activity a) {
 		this.mc = mc;
+		this.toast = t;
+		this.activity = a;
 	}
 
 	@Override
@@ -60,8 +68,10 @@ class LoginTask extends AsyncTask<String, Integer, String> {
 		try {
 			mc.login(params[0], params[1]); // TODO pas op, locks
 			Log.i("Login", "Success");
+			activity.finish();
 		} catch (MarietjeException me) {
 			Log.e("Login", "Failed");
+			toast.show();
 		}
 		return null;
 	}

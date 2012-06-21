@@ -52,7 +52,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		durationlist = new ArrayList<TextView>();
 
 		try {
-			mc = new MarietjeClient("192.168.1.86", 8080, "");
+			mc = new MarietjeClient("192.168.56.101", 8080, "");
 		} catch (MarietjeException e) {
 			Log.e("Err", e.getMessage());
 			Toast t = Toast.makeText(this.getApplicationContext(),
@@ -65,7 +65,8 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		updateQueue();
 
 		requesttxt = (AutoCompleteTextView) findViewById(R.id.requesttext);
-		RequestListener tc = new RequestListener(mc, requesttxt, this.getApplicationContext());
+		RequestListener tc = new RequestListener(mc, requesttxt,
+				this.getApplicationContext());
 		requesttxt.addTextChangedListener(tc);
 		this.tc = tc;
 
@@ -97,13 +98,16 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 			durationlist.clear();
 			muzieklijst.removeAllViews();
 			muzieklijst.refreshDrawableState();
-			double totalLength = (currentlyPlaying.getEndTime() - currentlyPlaying.getServerTime() + (currentlyPlaying
+			double totalLength = (currentlyPlaying.getEndTime()
+					- currentlyPlaying.getServerTime() + (currentlyPlaying
 					.getServerTime() - System.currentTimeMillis() / 1000));
 
 			for (MarietjeTrack mt : playlist) {
-				View v = LayoutInflater.from(this).inflate(R.layout.muziekitem, muzieklijst, false);
+				View v = LayoutInflater.from(this).inflate(R.layout.muziekitem,
+						muzieklijst, false);
 
-				RelativeLayout muzieklistrow = (RelativeLayout) v.findViewById(R.id.muziekitem);
+				RelativeLayout muzieklistrow = (RelativeLayout) v
+						.findViewById(R.id.muziekitem);
 
 				muzieklistrow.setTag(mt.getTrackKey());
 
@@ -111,7 +115,8 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 
 				((TextView) v.findViewById(R.id.title)).setText(mt.getTitle());
 
-				((TextView) v.findViewById(R.id.artist)).setText(mt.getArtist());
+				((TextView) v.findViewById(R.id.artist))
+						.setText(mt.getArtist());
 
 				TextView duration = (TextView) v.findViewById(R.id.tracklength);
 
@@ -168,17 +173,19 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-			case R.id.mnulogin:
-				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+		case R.id.mnulogin:
+			startActivityForResult(new Intent(getApplicationContext(),
+					LoginActivity.class), R.id.muziekLijst);
 
-				return true;
+			return true;
 
-			case R.id.mnuupload:
-				startActivity(new Intent(getApplicationContext(), UploadActivity.class));
+		case R.id.mnuupload:
+			startActivity(new Intent(getApplicationContext(),
+					UploadActivity.class));
 
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -198,8 +205,8 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 			artist = currentlyPlaying.getArtist();
 			title = currentlyPlaying.getTitle();
 		} catch (MarietjeException e) {
-			Toast t = Toast.makeText(this.getApplicationContext(), "Kon niet ophalen",
-					Toast.LENGTH_LONG);
+			Toast t = Toast.makeText(this.getApplicationContext(),
+					"Kon niet ophalen", Toast.LENGTH_LONG);
 			t.show();
 		} finally {
 			synchronized (txtCurrentlyPlaying) {
@@ -212,9 +219,10 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		Log.d("Request", requesttxt.getText().toString());
 
 		if (!mc.isLoggedIn()) {
-			Intent li = new Intent(this.getApplicationContext(), LoginActivity.class);
+			Intent li = new Intent(this.getApplicationContext(),
+					LoginActivity.class);
 
-			startActivity(li);
+			startActivityForResult(li, 123);
 		}
 
 		try {
@@ -222,7 +230,8 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 			this.requesttxt.setText("");
 		} catch (MarietjeException e) {
 			// oei
-			Toast.makeText(this.getApplicationContext(), "Whoops! Something went wrong.",
+			Toast.makeText(this.getApplicationContext(),
+					"You must log in before you can request a song!",
 					Toast.LENGTH_LONG).show();
 		}
 	}

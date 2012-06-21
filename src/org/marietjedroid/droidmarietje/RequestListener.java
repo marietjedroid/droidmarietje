@@ -27,12 +27,14 @@ public class RequestListener implements TextWatcher, OnItemClickListener {
 	private HashMap<String, String> hm = new HashMap<String, String>();
 	private String reqId = null;
 
-	public RequestListener(MarietjeClient mc, AutoCompleteTextView actv, Context c) {
+	public RequestListener(MarietjeClient mc, AutoCompleteTextView actv,
+			Context c) {
 		this.mc = mc;
 		this.actv = actv;
 		this.c = c;
 
-		aa = new ArrayAdapter<String>(c, android.R.layout.simple_dropdown_item_1line);
+		aa = new ArrayAdapter<String>(c,
+				android.R.layout.simple_dropdown_item_1line);
 
 		actv.setAdapter(aa);
 
@@ -44,7 +46,8 @@ public class RequestListener implements TextWatcher, OnItemClickListener {
 
 	}
 
-	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {
 		// TODO Auto-generated method stub
 
 	}
@@ -59,13 +62,15 @@ public class RequestListener implements TextWatcher, OnItemClickListener {
 		}
 
 		if (text.length() == 1) {
-			new RequestResult(mc, c, actv, aa, hm, reqId).execute(text.toLowerCase());
+			new RequestResult(mc, c, actv, aa, hm, reqId).execute(text
+					.toLowerCase());
 		}
 
 	}
 
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		String reqId = (String) hm.get(((TextView) arg0.getChildAt(arg2)).getText().toString());
+		String reqId = (String) hm.get(((TextView) arg0.getChildAt(arg2))
+				.getText().toString());
 
 		Log.i("reqId", reqId);
 
@@ -90,13 +95,18 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 
 	private String[] s;
 
-	public RequestResult(MarietjeClient mc, Context c, AutoCompleteTextView actv,
-			ArrayAdapter<String> aa, HashMap<String, String> hm, String reqId) {
+	public RequestResult(MarietjeClient mc, Context c,
+			AutoCompleteTextView actv, ArrayAdapter<String> aa,
+			HashMap<String, String> hm, String reqId) {
 		this.mc = mc;
 		this.c = c;
 		this.actv = actv;
 		this.hm = hm;
 		this.aa = aa;
+		actv.setAdapter(new ArrayAdapter<String>(c,
+				android.R.layout.simple_dropdown_item_1line, new String[0]));
+		if (true)
+			;
 	}
 
 	@Override
