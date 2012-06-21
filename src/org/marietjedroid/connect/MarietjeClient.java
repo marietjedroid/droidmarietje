@@ -70,8 +70,7 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @param path
 	 * @throws MarietjeException
 	 */
-	public MarietjeClient(String host, int port, String path)
-			throws MarietjeException {
+	public MarietjeClient(String host, int port, String path) throws MarietjeException {
 		this.channel = new MarietjeClientChannel(this, host, port, path);
 	}
 
@@ -123,8 +122,7 @@ public class MarietjeClient extends Observable implements Observer {
 				JSONObject req = requests.getJSONObject(i);
 				JSONObject media = req.getJSONObject("media");
 				String requester = req.optString("byKey", DEFAULT_REQUESTER);
-				queue.add(new MarietjeRequest(requester, req.getInt("key"),
-						media));
+				queue.add(new MarietjeRequest(requester, req.getInt("key"), media));
 			}
 
 		} catch (JSONException e) {
@@ -165,8 +163,7 @@ public class MarietjeClient extends Observable implements Observer {
 
 		this.followingQueue = false;
 		try {
-			this.channel.sendMessage(new JSONObject(
-					"{'type':'unfollow','which':['requests']}"));
+			this.channel.sendMessage(new JSONObject("{'type':'unfollow','which':['requests']}"));
 		} catch (JSONException e) {
 			throw new MarietjeException("JSON error");
 		}
@@ -231,8 +228,7 @@ public class MarietjeClient extends Observable implements Observer {
 		if (channel.getException() != null)
 			throw channel.getException();
 		try {
-			this.channel
-					.sendMessage("{'type':'unfollow','which':'['playing']}");
+			this.channel.sendMessage("{'type':'unfollow','which':'['playing']}");
 			this.followingPlaying = false;
 		} catch (JSONException e) {
 			throw new MarietjeException("JSON error");
@@ -246,8 +242,7 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @param password
 	 * @throws MarietjeException
 	 */
-	public void login(String username, String password)
-			throws MarietjeException {
+	public void login(String username, String password) throws MarietjeException {
 
 		if (channel.getException() != null)
 			throw channel.getException();
@@ -264,19 +259,21 @@ public class MarietjeClient extends Observable implements Observer {
 		}
 
 		String token = this.channel.getLoginToken();
-		
+
 		MessageDigest md5 = null;
 		try {
 			md5 = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
 			throw new MarietjeException("Problem with MD5 Message digest");
 		}
-		String md5pass = new String(org.apache.commons.codec.binary.Hex.encodeHex(md5.digest(password.getBytes())));
-		String hash = new String(org.apache.commons.codec.binary.Hex.encodeHex(md5.digest((md5pass+token).getBytes())));
-		
+		String md5pass = new String(org.apache.commons.codec.binary.Hex.encodeHex(md5
+				.digest(password.getBytes())));
+		String hash = new String(org.apache.commons.codec.binary.Hex.encodeHex(md5
+				.digest((md5pass + token).getBytes())));
+
 		try {
-			this.channel.sendPriorityMessage("{'type':'login', 'username':'"
-					+ username + "'," + "'hash':'" + hash + "'}");
+			this.channel.sendPriorityMessage("{'type':'login', 'username':'" + username + "',"
+					+ "'hash':'" + hash + "'}");
 		} catch (JSONException e) {
 			throw new MarietjeException("Problem with the JSON feed");
 		}
@@ -307,8 +304,7 @@ public class MarietjeClient extends Observable implements Observer {
 		if (this.accessKey.equals(""))
 			throw new MarietjeException("You must log in");
 		try {
-			this.channel.sendMessage("{'type':'request','mediaKey':'" + trackid
-					+ "'}");
+			this.channel.sendMessage("{'type':'request','mediaKey':'" + trackid + "'}");
 			this.requestsRetrieved.acquire();
 			if (this.channel.getRequestError() != null) {
 				throw new MarietjeException(this.channel.getRequestError());
@@ -362,8 +358,7 @@ public class MarietjeClient extends Observable implements Observer {
 	 * @return the list of tracks found, or null.
 	 * @throws MarietjeException
 	 */
-	public MarietjeTrack[] search(String query, int skip, int count)
-			throws MarietjeException {
+	public MarietjeTrack[] search(String query, int skip, int count) throws MarietjeException {
 		if (channel.getException() != null)
 			throw channel.getException();
 		synchronized (queryToken) {
@@ -371,9 +366,8 @@ public class MarietjeClient extends Observable implements Observer {
 		}
 
 		try {
-			this.channel.sendPriorityMessage("{'type':'query_media', 'token':"
-					+ queryToken + ",'skip':" + skip + ",'count':" + count
-					+ ",'query':'" + query + "'}");
+			this.channel.sendPriorityMessage("{'type':'query_media', 'token':" + queryToken
+					+ ",'skip':" + skip + ",'count':" + count + ",'query':'" + query + "'}");
 			this.queryResults.acquire();
 			return this.channel.getQueryResults();
 		} catch (JSONException e) {
@@ -411,12 +405,12 @@ public class MarietjeClient extends Observable implements Observer {
 	public void addObserver(Observer o) {
 		super.addObserver(o);
 	}
-	
+
 	/**
 	 * @return is logged in?
 	 */
 	public boolean isLoggedIn() {
-		return accessKey.equals("");
+		return !accessKey.equals("");
 	}
 
 }

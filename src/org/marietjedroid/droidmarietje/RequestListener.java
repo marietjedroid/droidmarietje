@@ -89,7 +89,6 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 	private HashMap<String, String> hm;
 
 	private String[] s;
-	private String reqId;
 
 	public RequestResult(MarietjeClient mc, Context c, AutoCompleteTextView actv,
 			ArrayAdapter<String> aa, HashMap<String, String> hm, String reqId) {
@@ -98,7 +97,6 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 		this.actv = actv;
 		this.hm = hm;
 		this.aa = aa;
-		this.reqId = reqId;
 	}
 
 	@Override
@@ -109,10 +107,6 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 
 			int length = mtArr.length;
 			Log.i("Length", "" + length);
-
-			if (length == 0) {
-				this.reqId = null;
-			}
 
 			s = new String[length];
 

@@ -18,7 +18,6 @@
 package org.marietjedroid.connect;
 
 import java.io.BufferedReader;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -36,11 +35,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.http.HttpResponse;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -104,9 +101,8 @@ public abstract class MarietjeMessenger extends Observable {
 		SecureRandom random = new SecureRandom();
 		while (true) {
 			String attempt = new BigInteger(130, random).toString();
-			attempt = new String(
-					org.apache.commons.codec.binary.Base64.encodeBase64(attempt
-							.getBytes())).substring(0, 7);
+			attempt = new String(org.apache.commons.codec.binary.Base64.encodeBase64(attempt
+					.getBytes())).substring(0, 7);
 
 			return attempt;
 		}
@@ -128,8 +124,7 @@ public abstract class MarietjeMessenger extends Observable {
 		MultipartEntity multipartStream = new MultipartEntity();
 		multipartStream.addPart("stream", stream);
 
-		final HttpPost post = new HttpPost(String.format("http://%s:%s%s",
-				host, port, path));
+		final HttpPost post = new HttpPost(String.format("http://%s:%s%s", host, port, path));
 		// FIXME sowieso stuk
 		post.setEntity(multipartStream);
 
@@ -194,16 +189,16 @@ public abstract class MarietjeMessenger extends Observable {
 					msgs = new ArrayList<JSONObject>(queueMessageIn);
 					queueMessageIn.clear();
 				}
-				
-				for(JSONObject msg : msgs) {
+
+				for (JSONObject msg : msgs) {
 					try {
-						handleMessage(token,msg);
+						handleMessage(token, msg);
 					} catch (JSONException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
-				
+
 				try {
 					messageInSemaphore.acquire();
 				} catch (InterruptedException e) {
@@ -345,8 +340,7 @@ public abstract class MarietjeMessenger extends Observable {
 		StringBuilder sb = new StringBuilder();
 		try {
 			HttpResponse r = httpClient.execute(hp);
-			InputStreamReader is = new InputStreamReader(r.getEntity()
-					.getContent());
+			InputStreamReader is = new InputStreamReader(r.getEntity().getContent());
 			BufferedReader br = new BufferedReader(is);
 			String line;
 			while ((line = br.readLine()) != null) {
@@ -354,8 +348,7 @@ public abstract class MarietjeMessenger extends Observable {
 				sb.append(line);
 			}
 		} catch (IOException e) {
-			MarietjeException tr = new MarietjeException("Connection stuk!"
-					+ e.getMessage());
+			MarietjeException tr = new MarietjeException("Connection stuk!" + e.getMessage());
 			this.exception = tr;
 			throw tr;
 		}
@@ -368,8 +361,7 @@ public abstract class MarietjeMessenger extends Observable {
 		}
 
 		if (d == null || d.length() != 3)
-			throw (exception = new MarietjeException(
-					"Unexpected length of response list"));
+			throw (exception = new MarietjeException("Unexpected length of response list"));
 		String token = null;
 		JSONArray msgs = null;
 		try {
@@ -377,8 +369,7 @@ public abstract class MarietjeMessenger extends Observable {
 			msgs = d.getJSONArray(1);
 			// JSONArray stream = d.getJSONArray(2);
 		} catch (JSONException e) {
-			throw (exception = new MarietjeException(
-					"unexpected format of response list"));
+			throw (exception = new MarietjeException("unexpected format of response list"));
 		}
 
 		synchronized (this.outSemaphore) {
@@ -424,8 +415,7 @@ public abstract class MarietjeMessenger extends Observable {
 	 * @param token
 	 * @param message
 	 */
-	protected abstract void handleMessage(String token, JSONObject message)
-			throws JSONException;
+	protected abstract void handleMessage(String token, JSONObject message) throws JSONException;
 
 	/**
 	 * Retrieve a stream

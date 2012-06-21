@@ -16,29 +16,30 @@
  */
 package org.marietjedroid.connect;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MarietjePlaying extends MarietjeTrack {
 	/**
-	 * @param byKey The one who requested it
-	 * @param servertime 
+	 * @param byKey
+	 *            The one who requested it
+	 * @param servertime
 	 * @param endtime
-	 * @param media media dict
+	 * @param media
+	 *            media dict
 	 */
-	public MarietjePlaying(String byKey, double servertime, double endtime, JSONObject media ) {
+	public MarietjePlaying(String byKey, double servertime, double endtime, JSONObject media) {
 		super(media);
 		this.serverTime = servertime;
 		this.endTime = endtime;
 	}
-	
+
 	/**
-	 * Tijd op de server ten tijde van zenden bericht 
+	 * Tijd op de server ten tijde van zenden bericht
 	 */
 	private double serverTime;
 
 	/**
-	 * Eindtijd track 
+	 * Eindtijd track
 	 */
 	private double endTime;
 
@@ -54,5 +55,5 @@ public class MarietjePlaying extends MarietjeTrack {
 	 */
 	public double getEndTime() {
 		return endTime;
-	} 
+	}
 }
