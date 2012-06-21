@@ -30,9 +30,9 @@ public class SongListener implements OnClickListener {
 
 		Intent i = new Intent(c, LastFmActivity.class);
 		i.putExtras(b);
-		
+
 		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		
+
 		c.startActivity(i);
 	}
 }
