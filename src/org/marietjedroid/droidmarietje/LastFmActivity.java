@@ -12,9 +12,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class LastFmActivity extends Activity {
 	private static String APIKEY = "f6e8b671a6ecf88a3660623406b93f16";
@@ -25,12 +29,13 @@ public class LastFmActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.songinfo);
 
-		Bundle b = getIntent().getExtras();
+		// Bundle b = getIntent().getExtras();
 
-		String artist = b.getString("artist");
-		String title = b.getString("title");
+		// String artist = b.getString("artist");
+		// String title = b.getString("title");
 
-		Log.i("SONG", artist + " " + title);
+		String artist = "Skrillex";
+		String title = "Scary monsters and nice sprites";
 
 		String artistUrl = URLEncoder.encode(artist);
 		String songUrl = URLEncoder.encode(title);
@@ -39,9 +44,26 @@ public class LastFmActivity extends Activity {
 				"http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=");
 		sb.append(APIKEY).append("&artist=" + artistUrl + "&track=" + songUrl);
 
-		Log.i("Request url", sb.toString());
+		LastFmParser lfp = new LastFmParser(sb.toString());
 
-		new getInfo().execute(sb.toString());
+		lfp.parse();
+
+		((TextView) findViewById(R.id.title)).setText(lfp.getTitle());
+		((TextView) findViewById(R.id.artist)).setText(lfp.getArtist());
+
+		((TextView) findViewById(R.id.album_title)).setText(lfp.getAlbum());
+
+		ImageView i = (ImageView) findViewById(R.id.albumart);
+
+		String albumArt = lfp.getAlbumArt();
+
+		try {
+			URL newurl = new URL(albumArt);
+
+			Bitmap mIcon_val = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+			i.setImageBitmap(mIcon_val);
+		} catch (IOException e) {
+		}
 	}
 }
 
@@ -50,8 +72,7 @@ class getInfo extends AsyncTask<String, Integer, String> {
 	protected String doInBackground(String... params) {
 		try {
 			URL lastfmpage = new URL(params[0]);
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					lastfmpage.openStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(lastfmpage.openStream()));
 
 			String inputLine;
 			StringBuilder webPage = new StringBuilder();
@@ -61,8 +82,7 @@ class getInfo extends AsyncTask<String, Integer, String> {
 			in.close();
 
 			// shit doen met de xml
-			DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = null;
 			try {
 				builder = builderFactory.newDocumentBuilder();

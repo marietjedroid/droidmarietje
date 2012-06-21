@@ -17,38 +17,19 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             >
-        	<AutoCompleteTextView 
-        	    android:id="@+id/requesttext"
-        	    android:layout_width="wrap_content"
-        	    android:layout_height="wrap_content"
-        	    android:padding="5dip"
-        	    android:hint="Request a song"
-        	    android:completionThreshold="1"
-        	    android:singleLine="true"
-        	    
-        	    />
-        	
-        	<Button android:id="@+id/requestbutton"
-        	    android:layout_width="wrap_content"
-        	    android:layout_height="wrap_content"
-        	    android:text="Request"
-        	    android:padding="5dip"
-        	    />
         </LinearLayout>
-        
-        	<TextView 
-        	    android:text="Currently Playing:"
-        	    android:textStyle="bold"
-        	    android:layout_width="fill_parent"
-        	    android:layout_height="wrap_content"
-        	   />
-        
-		   <TextView android:id="@+id/currentlyplaying"
-		       android:layout_height="wrap_content"
+        
+		   <TextView
+		       android:id="@+id/title"
 		       android:layout_width="fill_parent"
-			/>
+		       android:layout_height="wrap_content"
+		       android:textSize="20dip" />
         
-        
+		   <TextView
+		       android:id="@+id/artist"
+		       android:layout_width="fill_parent"
+		       android:layout_height="wrap_content"
+		       android:textSize="15dip" />
 	    <View 
 	        android:background="@drawable/border_bottom"
 	        android:layout_width="fill_parent"
@@ -62,12 +43,28 @@
         android:layout_height="fill_parent"
         android:layout_width="fill_parent"
         >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
+            
+            <ImageView 
+                android:id="@+id/albumart"
+                android:layout_width="100dip"
+                android:layout_height="100dip"
+                />
+            
+            <TextView
+                android:id="@+id/album_title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/albumart"
+                android:textSize="15dip"
+                android:textStyle="bold"
+                android:layout_marginLeft="5dip" />
+            
+        </RelativeLayout>
    		 
-        
-        
     </ScrollView>
-        
-
-
 
 </LinearLayout>
