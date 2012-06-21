@@ -33,29 +33,27 @@ public class LoginActivity extends Activity implements OnClickListener {
 
 		String username = txtUsername.getText().toString().trim();
 		String password = txtPassword.getText().toString().trim();
-	
+
 		if (username.equals("") || password.equals("")) {
 			// not all fields have been filled out
 			return;
 		}
-		
+
 		AsyncTask<String, Integer, String> asyncTask = new LoginTask(mc);
-		
-		asyncTask.execute(new String[] {username, password});
-		
-		
-		
+
+		asyncTask.execute(new String[] { username, password });
+
 	}
 }
 
-class LoginTask extends AsyncTask<String, Integer, String>{
+class LoginTask extends AsyncTask<String, Integer, String> {
 
 	private MarietjeClient mc;
 
-	public LoginTask(MarietjeClient mc){
+	public LoginTask(MarietjeClient mc) {
 		this.mc = mc;
 	}
-	
+
 	@Override
 	protected String doInBackground(String... params) {
 		Log.i("Inloggen", "Nu mee bezig... " + params[0] + ":" + params[1]);
@@ -67,5 +65,5 @@ class LoginTask extends AsyncTask<String, Integer, String>{
 		}
 		return null;
 	}
-	
+
 }

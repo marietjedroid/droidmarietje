@@ -24,7 +24,7 @@
         	    android:layout_alignParentLeft="true"
         	    android:layout_toLeftOf="@+id/requestbutton"
         	    android:completionThreshold="1"
-        	    android:hint="Request a song"
+        	    android:hint="@string/requestasong"
         	    android:padding="5dip"
         	    android:singleLine="true" />
 
@@ -35,12 +35,12 @@
         	    android:layout_alignParentRight="true"
         	    android:layout_alignParentTop="true"
         	    android:padding="5dip"
-        	    android:text="Request" />
+        	    android:text="@string/request" />
 
         </RelativeLayout>
         
         	<TextView 
-        	    android:text="Currently Playing:"
+        	    android:text="@string/currentlyplaying"
         	    android:textStyle="bold"
         	    android:layout_width="fill_parent"
         	    android:layout_height="wrap_content"
@@ -75,15 +75,7 @@
             
             <!--        
 	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
-	       <include layout="@layout/muziekitem" />
+	       Hier komt de queue
 	       -->
         
         </LinearLayout>

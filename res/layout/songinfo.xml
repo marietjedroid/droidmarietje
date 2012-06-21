@@ -10,15 +10,7 @@
         android:id="@+id/currentlyplayingwrap"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-        
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-        </LinearLayout>
-        
+        android:orientation="vertical">        
 		   <TextView
 		       android:id="@+id/title"
 		       android:layout_width="fill_parent"
@@ -46,19 +38,19 @@
 
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
+            android:layout_height="wrap_content" >
             
             <RelativeLayout
                 android:id="@+id/albumwrap"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 >
-	            <ImageView 
+	            <ImageView
 	                android:id="@+id/albumart"
+	                android:contentDescription="@string/albumart"
 	                android:layout_width="100dip"
 	                android:layout_height="100dip"
-	                />
-	            		
+	            />	
 	            <TextView
 	                android:id="@+id/album_title"
 	                android:layout_width="fill_parent"

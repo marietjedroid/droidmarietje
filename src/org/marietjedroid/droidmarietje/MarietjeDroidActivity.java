@@ -65,8 +65,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 		updateQueue();
 
 		requesttxt = (AutoCompleteTextView) findViewById(R.id.requesttext);
-		RequestListener tc = new RequestListener(mc, requesttxt,
-				this.getApplicationContext());
+		RequestListener tc = new RequestListener(mc, requesttxt, this.getApplicationContext());
 		requesttxt.addTextChangedListener(tc);
 		this.tc = tc;
 
@@ -98,16 +97,13 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 			durationlist.clear();
 			muzieklijst.removeAllViews();
 			muzieklijst.refreshDrawableState();
-			double totalLength = (currentlyPlaying.getEndTime()
-					- currentlyPlaying.getServerTime() + (currentlyPlaying
+			double totalLength = (currentlyPlaying.getEndTime() - currentlyPlaying.getServerTime() + (currentlyPlaying
 					.getServerTime() - System.currentTimeMillis() / 1000));
 
 			for (MarietjeTrack mt : playlist) {
-				View v = LayoutInflater.from(this).inflate(R.layout.muziekitem,
-						muzieklijst, false);
+				View v = LayoutInflater.from(this).inflate(R.layout.muziekitem, muzieklijst, false);
 
-				RelativeLayout muzieklistrow = (RelativeLayout) v
-						.findViewById(R.id.muziekitem);
+				RelativeLayout muzieklistrow = (RelativeLayout) v.findViewById(R.id.muziekitem);
 
 				muzieklistrow.setTag(mt.getTrackKey());
 
@@ -115,8 +111,7 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 
 				((TextView) v.findViewById(R.id.title)).setText(mt.getTitle());
 
-				((TextView) v.findViewById(R.id.artist))
-						.setText(mt.getArtist());
+				((TextView) v.findViewById(R.id.artist)).setText(mt.getArtist());
 
 				TextView duration = (TextView) v.findViewById(R.id.tracklength);
 
@@ -173,19 +168,17 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.mnulogin:
-			startActivity(new Intent(getApplicationContext(),
-					LoginActivity.class));
+			case R.id.mnulogin:
+				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 
-			return true;
+				return true;
 
-		case R.id.mnuupload:
-			startActivity(new Intent(getApplicationContext(),
-					UploadActivity.class));
+			case R.id.mnuupload:
+				startActivity(new Intent(getApplicationContext(), UploadActivity.class));
 
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -205,8 +198,8 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 			artist = currentlyPlaying.getArtist();
 			title = currentlyPlaying.getTitle();
 		} catch (MarietjeException e) {
-			Toast t = Toast.makeText(this.getApplicationContext(),
-					"Kon niet ophalen", Toast.LENGTH_LONG);
+			Toast t = Toast.makeText(this.getApplicationContext(), "Kon niet ophalen",
+					Toast.LENGTH_LONG);
 			t.show();
 		} finally {
 			synchronized (txtCurrentlyPlaying) {
@@ -221,11 +214,10 @@ public class MarietjeDroidActivity extends Activity implements OnClickListener {
 			mc.requestTrack(tc.getReqId());
 			this.requesttxt.setText("");
 		} catch (MarietjeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(0);
+			// niet ingelogd of andere fout
+			Intent li = new Intent(this.getApplicationContext(), LoginActivity.class);
+
+			startActivity(li);
 		}
-
 	}
-
 }

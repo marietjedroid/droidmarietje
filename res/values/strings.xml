@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, MarietjeDroidActivity!</string>
     <string name="app_name">MarietjeDroid</string>
+    <string name="requestasong">Request a song</string>
+    <string name="request">Request</string>
+    <string name="currentlyplaying">Currently Playing:</string>
+    
+    <string name="albumart">Album Art</string>
 
 </resources>
