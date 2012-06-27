@@ -122,9 +122,9 @@ class RequestResult extends AsyncTask<String, Integer, String> {
 
 			int i = 0;
 			for (MarietjeTrack mt : mtArr) {
-				aa.add(mt.getTitle());
-				hm.put(mt.getTitle(), mt.getTrackKey());
-				s[i] = mt.getTitle();
+				aa.add(mt.getTitle()+ " - " + mt.getArtist());
+				hm.put(mt.getTitle()+ " - " + mt.getArtist(), mt.getTrackKey());
+				s[i] = mt.getTitle()+ " - " + mt.getArtist();
 				i++;
 				Log.i("Track", mt.getTitle());
 			}

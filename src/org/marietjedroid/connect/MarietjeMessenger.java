@@ -237,7 +237,7 @@ public abstract class MarietjeMessenger extends Observable {
 
 		// do we need to execute the wait code?
 		// needed for the synchronized.
-		Boolean wait = false;
+		/*Boolean wait = false;
 		synchronized (nPending) {
 			if ((queueOut.isEmpty() || token == null) && nPending > 0)
 				wait = true;
@@ -250,7 +250,7 @@ public abstract class MarietjeMessenger extends Observable {
 			if (!running)
 				return;
 			sendMessages();
-		}
+		}*/
 		synchronized (nPending) {
 			nPending++;
 		}

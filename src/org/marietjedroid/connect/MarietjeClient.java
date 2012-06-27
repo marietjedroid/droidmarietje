@@ -247,6 +247,8 @@ public class MarietjeClient extends Observable implements Observer {
 		if (channel.getException() != null)
 			throw channel.getException();
 
+		if(this.isLoggedIn()) return;
+		
 		try {
 			this.channel.sendPriorityMessage("{'type':'request_login_token'}");
 			this.loginAttempt.acquire();
@@ -304,7 +306,7 @@ public class MarietjeClient extends Observable implements Observer {
 		if (this.accessKey.equals(""))
 			throw new MarietjeException("You must log in");
 		try {
-			this.channel.sendMessage("{'type':'request','mediaKey':'" + trackid + "'}");
+			this.channel.sendPriorityMessage("{'type':'request','mediaKey':'" + trackid + "'}");
 			this.requestsRetrieved.acquire();
 			if (this.channel.getRequestError() != null) {
 				throw new MarietjeException(this.channel.getRequestError());

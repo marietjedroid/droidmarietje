@@ -70,7 +70,7 @@ class LoginTask extends AsyncTask<String, Integer, String> {
 			Log.i("Login", "Success");
 			activity.finish();
 		} catch (MarietjeException me) {
-			Log.e("Login", "Failed");
+			Log.e("Login", "Failed", me);
 			toast.show();
 		}
 		return null;
